@@ -14,6 +14,7 @@
 
 
 
+const int HOURS_IN_DAY = 24;
 
 const int START_DAY = 1;
 int current_day;
@@ -45,8 +46,10 @@ void init_variables()
 }
 
 void print_action_selection();
-int get_user_selection();
+int get_int_input();
 char* get_military_time(int hour);
+void feed_forward_time(int hours_to_skip);
+
 
 int main() 
 {   
@@ -60,7 +63,7 @@ int main()
 	while(1) 
 	{
 		print_action_selection();
-		int user_selection = get_user_selection();
+		int user_selection = get_int_input("");
 		
 		switch (user_selection) 
 		{
@@ -72,33 +75,45 @@ int main()
 			printf("Текущее время: День %d, %s \n\n", current_day, get_military_time(current_hour));
 			break;
 		case SELECTION_WORK:
-			printf("2");
+			;
+			int work_hours = 0;
+			while (1) {
+				work_hours = get_int_input("Сколько часов вы хотите работать?");
+				if (work_hours <= 0) {
+					printf("Надо работать, а не филонить!\n");
+					continue;
+				}
+				break;
+			}
+			printf("Работаю %d часов...\n\n", work_hours);
+			feed_forward_time(work_hours);
 			break;
 		case SELECTION_CHECK_INVENTORY:
-			printf("3");
+			printf("3\n");
 			break;
 		case SELECTION_SET_ITEM:
-			printf("4");
+			printf("4\n");
 			break;
 		case SELECTION_DROP_ITEM:
-			printf("5");
+			printf("5\n");
 			break;
 		case SELECTION_INVENTORY_REVISION:
-			printf("6");
+			printf("6\n");
 			break;
 		default:
-			printf("Такого действия нет!");
+			printf("Такого действия нет!\n");
 			break;
 		}
 	}
 	return 0;
 }
 
-int get_user_selection()
+int get_int_input(char* message)
 {
 	while(1)
 	{
-		printf(">>>");
+		printf(message);
+		printf("\n>>>");
 		int raw_input;
 		if (scanf("%d", &raw_input) != 1)
 		{
@@ -121,13 +136,11 @@ void print_action_selection()
 	printf("[4] - Положить предмет в слот\n");
 	printf("[5] - Выбросить предмет\n");
 	printf("[6] - Ревизия ресурсов\n");
-	printf("\n");
 	
 }
 
 char* get_military_time(int hour) {
 	hour %= 24;
-	//if (hour < 10)
 	static char result[6] = "";
 	
 	if (hour < 10) {
@@ -136,4 +149,12 @@ char* get_military_time(int hour) {
 	snprintf(result, sizeof(result), "%02d:00", hour);
 	return result;
 
+}
+
+
+void feed_forward_time(int hours_to_skip) {
+	current_hour += hours_to_skip;
+	int days_passed = current_hour / HOURS_IN_DAY;
+	current_hour %= 24;
+	current_day += days_passed;
 }
