@@ -75,6 +75,7 @@ void init_variables()
 	 inventory[2] = ITEM_SEEDS;
 	 inventory[3] = ITEM_SEEDS;
 
+	 inventory[7] = ITEM_CARROT;
 	 inventory[8] = ITEM_CARROT;
 	 inventory[9] = ITEM_APPLE;
 }
@@ -89,12 +90,14 @@ void print_id_to_item();
 //		----	Геймплейные функции				----
 void feed_forward_time(int hours_to_skip);
 int set_item(int slot_index, int item_id);
+int count_items(int item_id);
 
 //		----	Функции выбора из меню			----
 void menu_work();
 void menu_check_inventory();
 void menu_set_item();
 void menu_drop_item();
+void menu_inventory_revision();
 
 int main() 
 {   
@@ -135,7 +138,7 @@ int main()
 			menu_drop_item();
 			break;
 		case SELECTION_INVENTORY_REVISION:
-			printf("6\n");
+			menu_inventory_revision();
 			break;
 		default:
 			printf("Такого действия нет!\n");
@@ -237,6 +240,16 @@ int set_item(int slot_index, int item_id) {
 	return 1;
 }
 
+int count_items(int item_id) {
+	int items_count = 0;
+	for (int i = 0; i < INVENTORY_SIZE; i++)
+	{
+		if (inventory[i] == item_id)
+			items_count++;
+	}
+	return items_count;
+}
+
 
 void menu_work() {
 	int work_hours = 0;
@@ -291,4 +304,38 @@ void menu_drop_item() {
 
 	set_item(slot_index, ITEM_EMPTY);
 	printf("\n\n");
+}
+
+void menu_inventory_revision() {
+	print_id_to_item();
+	int item_id = get_int_input_range("Введите айдишник предмета для ревизии", 1, UNIQUE_ITEMS_COUNT - 1);
+
+	int items_count = count_items(item_id);
+	
+	if (items_count == 0) {
+		printf("У меня нет такого предмета((\n");
+	}
+	else if(items_count == 1) {
+		for (int i = 0; i < INVENTORY_SIZE; i++)
+		{
+			if (inventory[i] == item_id) {
+				printf("Единственный предмет '%s' лежит в слоте %d\n", item_id_to_name[item_id], i);
+				break;
+			}
+		}
+		
+	}
+	else {
+		printf("Количество предметов '%s' - %d\n", item_id_to_name[item_id], items_count);
+		printf("Они лежат в слотах:");
+		for (int i = 0; i < INVENTORY_SIZE; i++)
+		{
+			if (inventory[i] == item_id) {
+				printf(" %d,", i);
+			}
+		}
+	}
+	printf("\n\n");
+	
+
 }
