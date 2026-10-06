@@ -255,14 +255,19 @@ void menu_work() {
 	int work_hours = 0;
 	while (1) {
 		work_hours = get_int_input("Сколько часов вы хотите работать?");
-		if (work_hours <= 0) {
-			printf("Надо работать, а не филонить!\n");
+		if (work_hours < 0) {
+			printf("Вы путешественник во времени?\n");
 			continue;
 		}
 		break;
 	}
-	printf("Работаю %d часов...\n\n", work_hours);
-	feed_forward_time(work_hours);
+	if (work_hours == 0) {
+		printf("Вы решили не работать...\n\n");
+	}
+	else {
+		printf("Работаю %d часов...\n\n", work_hours);
+		feed_forward_time(work_hours);
+	}
 }
 
 void menu_check_inventory() {
