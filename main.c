@@ -86,6 +86,9 @@ int get_int_input(char* message);
 int get_int_input_range(char* message, int lowest_value, int highest_value);
 char* get_military_time(int hour);
 void print_id_to_item();
+void show_time() {
+	printf("День %d, %s", current_day, get_military_time(current_hour));
+}
 
 //		----	Геймплейные функции				----
 void feed_forward_time(int hours_to_skip);
@@ -121,7 +124,9 @@ int main()
 			return 0;
 
 		case SELECTION_CHECK_TIME:
-			printf("Текущее время: День %d, %s \n\n", current_day, get_military_time(current_hour));
+			printf("Текущее время: ");
+			show_time();
+			printf("\n\n");
 			break;
 
 		case SELECTION_WORK:
@@ -265,8 +270,14 @@ void menu_work() {
 		printf("Вы решили не работать...\n\n");
 	}
 	else {
-		printf("Работаю %d часов...\n\n", work_hours);
+		printf("Начинаю работать в ");
+		show_time();
+		printf("\n");
+		printf("Работаю %d часов...\n", work_hours);
 		feed_forward_time(work_hours);
+		printf("Закончил работать в ");
+		show_time();
+		printf("\n\n");
 	}
 }
 
