@@ -58,10 +58,14 @@ void init_variables()
 	 
 }
 
+
 void print_action_selection();
 int get_int_input();
 char* get_military_time(int hour);
 void feed_forward_time(int hours_to_skip);
+
+void menu_work();
+void menu_check_inventory();
 
 
 int main() 
@@ -75,6 +79,7 @@ int main()
 	//Main loop
 	while(1) 
 	{
+
 		print_action_selection();
 		int user_selection = get_int_input("");
 		
@@ -89,22 +94,11 @@ int main()
 			break;
 
 		case SELECTION_WORK:
-			;
-			int work_hours = 0;
-			while (1) {
-				work_hours = get_int_input("Сколько часов вы хотите работать?");
-				if (work_hours <= 0) {
-					printf("Надо работать, а не филонить!\n");
-					continue;
-				}
-				break;
-			}
-			printf("Работаю %d часов...\n\n", work_hours);
-			feed_forward_time(work_hours);
+			menu_work();
 			break;
 
 		case SELECTION_CHECK_INVENTORY:
-			printf("3\n");
+			menu_check_inventory();
 			break;
 		case SELECTION_SET_ITEM:
 			printf("4\n");
@@ -119,6 +113,7 @@ int main()
 			printf("Такого действия нет!\n");
 			break;
 		}
+
 	}
 	return 0;
 }
@@ -172,4 +167,27 @@ void feed_forward_time(int hours_to_skip) {
 	int days_passed = current_hour / HOURS_IN_DAY;
 	current_hour %= 24;
 	current_day += days_passed;
+}
+
+
+void menu_work() {
+	int work_hours = 0;
+	while (1) {
+		work_hours = get_int_input("Сколько часов вы хотите работать?");
+		if (work_hours <= 0) {
+			printf("Надо работать, а не филонить!\n");
+			continue;
+		}
+		break;
+	}
+	printf("Работаю %d часов...\n\n", work_hours);
+	feed_forward_time(work_hours);
+}
+
+void menu_check_inventory() {
+	for (int i = 0; i < INVENTORY_SIZE; i++)
+	{
+		printf("Слот %d: %s\n", i, item_id_to_name[ inventory[i] ]);
+	}
+	printf("\n");
 }
