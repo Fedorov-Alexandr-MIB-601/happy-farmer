@@ -32,12 +32,25 @@ int inventory[INVENTORY_SIZE];
  * 2 - Камень
  * 3 - Семена
  * 4 - Лопата
- * 5 - Потом придумаю
- * 6 - Потом придумаю
- * 7 - Потом придумаю
- * 8 - Потом придумаю
- * 9 - Потом придумаю
+ * 5 - Лейка
+ * 6 - Лукошко
+ * 7 - Яблоко
+ * 8 - Морковка
+ * 9 - Ягода
  */
+const char item_id_to_name[][64] = {
+	"Пусто",
+	"Дерево",
+	"Камень",
+	"Семена",
+	"Лопата",
+	"Лейка",
+	"Лукошко",
+	"Яблоко",
+	"Морковка",
+	"Ягода"
+};
+
 void init_variables() 
 {
 	 current_day = START_DAY;
@@ -70,10 +83,11 @@ int main()
 		case SELECTION_EXIT:
 			printf("Выход из программы...\n");
 			return 0;
-			break;
+
 		case SELECTION_CHECK_TIME:
 			printf("Текущее время: День %d, %s \n\n", current_day, get_military_time(current_hour));
 			break;
+
 		case SELECTION_WORK:
 			;
 			int work_hours = 0;
@@ -88,6 +102,7 @@ int main()
 			printf("Работаю %d часов...\n\n", work_hours);
 			feed_forward_time(work_hours);
 			break;
+
 		case SELECTION_CHECK_INVENTORY:
 			printf("3\n");
 			break;
