@@ -94,6 +94,7 @@ int set_item(int slot_index, int item_id);
 void menu_work();
 void menu_check_inventory();
 void menu_set_item();
+void menu_drop_item();
 
 int main() 
 {   
@@ -131,7 +132,7 @@ int main()
 			menu_set_item();
 			break;
 		case SELECTION_DROP_ITEM:
-			printf("5\n");
+			menu_drop_item();
 			break;
 		case SELECTION_INVENTORY_REVISION:
 			printf("6\n");
@@ -212,7 +213,7 @@ char* get_military_time(int hour) {
 
 }
 void print_id_to_item() {
-	for (int i = 0; i < UNIQUE_ITEMS_COUNT; i++)
+	for (int i = 1; i < UNIQUE_ITEMS_COUNT; i++)
 	{
 		printf("[%d] - %s\n", i, item_id_to_name[i]);
 	}
@@ -268,13 +269,26 @@ void menu_set_item() {
 	int old_item = inventory[slot_index];
 
 	print_id_to_item();
-	int item_id = get_int_input_range("Введите айдишник желаемого предмета", 0, UNIQUE_ITEMS_COUNT - 1);
+	int item_id = get_int_input_range("Введите айдишник желаемого предмета", 1, UNIQUE_ITEMS_COUNT - 1);
 	
 	if (old_item == 0)
 		printf("Устанавливаю предмет %s в слот %d...", item_id_to_name[item_id], slot_index);
 	else
 		printf("Заменяю предмет %s в слоте %d на %s...", item_id_to_name[old_item], slot_index, item_id_to_name[item_id]);
 	
-	inventory[slot_index] = item_id;
+	set_item(slot_index, item_id);
+	printf("\n\n");
+}
+
+void menu_drop_item() {
+	int slot_index = get_int_input_range("Введите индекс слота из которого нужно выбросить предмет", 0, INVENTORY_SIZE - 1);
+	int old_item = inventory[slot_index];
+
+	if (old_item == 0)
+		printf("В этом слоте уже ничего не было...");
+	else
+		printf("Выбрасываю предмет %s из слота %d...", item_id_to_name[old_item], slot_index);
+
+	set_item(slot_index, ITEM_EMPTY);
 	printf("\n\n");
 }
