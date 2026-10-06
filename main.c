@@ -25,6 +25,8 @@ int current_hour;
 #define INVENTORY_SIZE 10
 int inventory[INVENTORY_SIZE];
 
+
+const int UNIQUE_ITEMS_COUNT = 10;
 /* item_ids
  * 
  * 0 - Пусто
@@ -50,23 +52,48 @@ const char item_id_to_name[][64] = {
 	"Морковка",
 	"Ягода"
 };
+#define ITEM_EMPTY 0
+#define ITEM_WOOD 1
+#define ITEM_STONE 2
+#define ITEM_SEEDS 3
+#define ITEM_SHOVEL 4
+#define ITEM_WATERING_CAN 5
+#define ITEM_BASKET 6
+#define ITEM_APPLE 7
+#define ITEM_CARROT 8
+#define ITEM_BERRY 9
+
+
 
 void init_variables() 
 {
 	 current_day = START_DAY;
 	 current_hour = START_HOUR;
-	 
+
+	 inventory[0] = ITEM_SHOVEL;
+	 inventory[1] = ITEM_WATERING_CAN;
+	 inventory[2] = ITEM_SEEDS;
+	 inventory[3] = ITEM_SEEDS;
+
+	 inventory[8] = ITEM_CARROT;
+	 inventory[9] = ITEM_APPLE;
 }
 
-
+//		----	Функции для помощи при выводе	----
 void print_action_selection();
-int get_int_input();
+int get_int_input(char* message);
+int get_int_input_range(char* message, int lowest_value, int highest_value);
 char* get_military_time(int hour);
-void feed_forward_time(int hours_to_skip);
+void print_id_to_item();
 
+//		----	Геймплейные функции				----
+void feed_forward_time(int hours_to_skip);
+int set_item(int slot_index, int item_id);
+
+//		----	Функции выбора из меню			----
 void menu_work();
 void menu_check_inventory();
-
+void menu_set_item();
 
 int main() 
 {   
@@ -81,7 +108,7 @@ int main()
 	{
 
 		print_action_selection();
-		int user_selection = get_int_input("");
+		int user_selection = get_int_input_range("", 0, 6);
 		
 		switch (user_selection) 
 		{
@@ -101,7 +128,7 @@ int main()
 			menu_check_inventory();
 			break;
 		case SELECTION_SET_ITEM:
-			printf("4\n");
+			menu_set_item();
 			break;
 		case SELECTION_DROP_ITEM:
 			printf("5\n");
@@ -118,7 +145,26 @@ int main()
 	return 0;
 }
 
+
 int get_int_input(char* message)
+{
+	while (1)
+	{
+		printf(message);
+		printf("\n>>>");
+		int raw_input;
+		if (scanf("%d", &raw_input) != 1)
+		{
+			printf("Кажется, это не число...\n");
+			scanf("%*s");
+			continue;
+		}
+		return raw_input;
+	}
+	return -1;
+}
+
+int get_int_input_range(char* message, int lowest_value, int highest_value)
 {
 	while(1)
 	{
@@ -129,6 +175,11 @@ int get_int_input(char* message)
 		{
 			printf("Кажется, это не число...\n");
 			scanf("%*s");
+			continue;
+		}
+
+		if (raw_input < lowest_value || raw_input > highest_value) {
+			printf("Число дожно быть в диапазоне от %d до %d включительно!\n", lowest_value, highest_value);
 			continue;
 		}
 		return raw_input;
@@ -160,13 +211,29 @@ char* get_military_time(int hour) {
 	return result;
 
 }
+void print_id_to_item() {
+	for (int i = 0; i < UNIQUE_ITEMS_COUNT; i++)
+	{
+		printf("[%d] - %s\n", i, item_id_to_name[i]);
+	}
 
+}
 
 void feed_forward_time(int hours_to_skip) {
 	current_hour += hours_to_skip;
 	int days_passed = current_hour / HOURS_IN_DAY;
 	current_hour %= 24;
 	current_day += days_passed;
+}
+
+int set_item(int slot_index, int item_id) {
+	if (slot_index < 0 || slot_index > INVENTORY_SIZE)
+		return 0;
+	if (item_id < 0 || item_id > UNIQUE_ITEMS_COUNT)
+		return 0;
+
+	inventory[slot_index] = item_id;
+	return 1;
 }
 
 
@@ -185,9 +252,29 @@ void menu_work() {
 }
 
 void menu_check_inventory() {
+	printf("Вот что у меня в карманах:\n");
 	for (int i = 0; i < INVENTORY_SIZE; i++)
 	{
 		printf("Слот %d: %s\n", i, item_id_to_name[ inventory[i] ]);
 	}
 	printf("\n");
+}
+
+
+
+
+void menu_set_item() {
+	int slot_index = get_int_input_range("Введите индекс слота для установки предмета", 0, INVENTORY_SIZE - 1);
+	int old_item = inventory[slot_index];
+
+	print_id_to_item();
+	int item_id = get_int_input_range("Введите айдишник желаемого предмета", 0, UNIQUE_ITEMS_COUNT - 1);
+	
+	if (old_item == 0)
+		printf("Устанавливаю предмет %s в слот %d...", item_id_to_name[item_id], slot_index);
+	else
+		printf("Заменяю предмет %s в слоте %d на %s...", item_id_to_name[old_item], slot_index, item_id_to_name[item_id]);
+	
+	inventory[slot_index] = item_id;
+	printf("\n\n");
 }
