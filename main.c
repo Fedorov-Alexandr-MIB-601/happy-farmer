@@ -80,6 +80,10 @@ void init_variables()
 	 inventory[9] = ITEM_APPLE;
 }
 
+//		----	Функции сепарации логики		----
+void setup();
+int loop(); //Вернуть 0, если хочешь оборвать вечный цикл
+
 //		----	Функции для помощи при выводе	----
 void print_action_selection();
 int get_int_input(char* message);
@@ -104,55 +108,61 @@ void menu_inventory_revision();
 
 int main() 
 {   
-	setlocale(LC_ALL, ".UTF8"); //нейронка сказала, это надо чтобы было без кракозябр в выводе
-
-	printf("Happy Farmer v0.01\n\n");
+	setlocale(LC_ALL, ".UTF8"); //Тимофей Владиславович сказал, это надо чтобы было без кракозябр в выводе
+	printf("Happy Farmer v0.02\n\n");
 	
-	init_variables();
+	setup();
 	
-	//Main loop
-	while(1) 
-	{
+	//Вот это я смешную конструкцию придумал
+	while (loop());
 
-		print_action_selection();
-		int user_selection = get_int_input_range("", 0, 6);
-		
-		switch (user_selection) 
-		{
-		case SELECTION_EXIT:
-			printf("Выход из программы...\n");
-			return 0;
 
-		case SELECTION_CHECK_TIME:
-			printf("Текущее время: ");
-			show_time();
-			printf("\n\n");
-			break;
-
-		case SELECTION_WORK:
-			menu_work();
-			break;
-
-		case SELECTION_CHECK_INVENTORY:
-			menu_check_inventory();
-			break;
-		case SELECTION_SET_ITEM:
-			menu_set_item();
-			break;
-		case SELECTION_DROP_ITEM:
-			menu_drop_item();
-			break;
-		case SELECTION_INVENTORY_REVISION:
-			menu_inventory_revision();
-			break;
-		default:
-			printf("Такого действия нет!\n");
-			break;
-		}
-
-	}
 	return 0;
 }
+
+void setup() {
+	init_variables();
+}
+
+int loop() {
+	print_action_selection();
+	int user_selection = get_int_input_range("", 0, 6);
+
+	switch (user_selection)
+	{
+	case SELECTION_EXIT:
+		printf("Выход из программы...\n");
+		return 0;
+
+	case SELECTION_CHECK_TIME:
+		printf("Текущее время: ");
+		show_time();
+		printf("\n\n");
+		break;
+
+	case SELECTION_WORK:
+		menu_work();
+		break;
+
+	case SELECTION_CHECK_INVENTORY:
+		menu_check_inventory();
+		break;
+	case SELECTION_SET_ITEM:
+		menu_set_item();
+		break;
+	case SELECTION_DROP_ITEM:
+		menu_drop_item();
+		break;
+	case SELECTION_INVENTORY_REVISION:
+		menu_inventory_revision();
+		break;
+	default:
+		printf("Такого действия нет!\n");
+		break;
+	}
+	return 1;
+}
+
 
 
 int get_int_input(char* message)
