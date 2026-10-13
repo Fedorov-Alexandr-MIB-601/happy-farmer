@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <locale.h>
+#include <stdlib.h>
 #include <Windows.h>
 
 
@@ -29,8 +29,10 @@ const char username[64];
 
 
 // Было бы классно избавиться от этого и загружать всё из файлика
-const int UNIQUE_ITEMS_COUNT = 10;
-const char item_id_to_name[][64] = {
+
+#define MAX_ITEMS_COUNT 10
+#define MAX_ITEM_NAME 64
+const char item_id_to_name[MAX_ITEMS_COUNT][MAX_ITEM_NAME] = {
 	"Пусто",
 	"Дерево",
 	"Камень",
@@ -42,16 +44,6 @@ const char item_id_to_name[][64] = {
 	"Морковка",
 	"Ягода"
 };
-#define ITEM_EMPTY 0
-#define ITEM_WOOD 1
-#define ITEM_STONE 2
-#define ITEM_SEEDS 3
-#define ITEM_SHOVEL 4
-#define ITEM_WATERING_CAN 5
-#define ITEM_BASKET 6
-#define ITEM_APPLE 7
-#define ITEM_CARROT 8
-#define ITEM_BERRY 9
 //
 
 
@@ -78,9 +70,14 @@ void show_time() {
 	printf("День %d, %s", current_day, get_military_time(current_hour));
 }
 
+
+//		----	Функции для работы с файлами	----
+void parse_config(const char* filepath, char** keys, char** values);
+
 //		----	Геймплейные функции				----
 void feed_forward_time(int hours_to_skip);
 int set_item(int slot_index, int item_id);
+int clear_item(int slot_index);
 int count_items(int item_id);
 
 //		----	Функции выбора из меню			----
@@ -106,6 +103,7 @@ int main()
 }
 
 void setup() {
+	parse_config("assets/items.txt", NULL, NULL);
 	init_variables();
 	ask_username();
 }
@@ -118,14 +116,6 @@ void init_variables()
 	current_day = START_DAY;
 	current_hour = START_HOUR;
 
-	inventory[0] = ITEM_SHOVEL;
-	inventory[1] = ITEM_WATERING_CAN;
-	inventory[2] = ITEM_SEEDS;
-	inventory[3] = ITEM_SEEDS;
-
-	inventory[7] = ITEM_CARROT;
-	inventory[8] = ITEM_CARROT;
-	inventory[9] = ITEM_APPLE;
 }
 
 void remove_newlines(char* str) {
@@ -266,7 +256,7 @@ char* get_military_time(int hour) {
 
 }
 void print_id_to_item() {
-	for (int i = 1; i < UNIQUE_ITEMS_COUNT; i++)
+	for (int i = 1; i < MAX_ITEMS_COUNT; i++)
 	{
 		printf("[%d] - %s\n", i, item_id_to_name[i]);
 	}
@@ -284,11 +274,15 @@ void feed_forward_time(int hours_to_skip) {
 int set_item(int slot_index, int item_id) {
 	if (slot_index < 0 || slot_index > INVENTORY_SIZE)
 		return 0;
-	if (item_id < 0 || item_id > UNIQUE_ITEMS_COUNT)
+	if (item_id < 0 || item_id > MAX_ITEMS_COUNT)
 		return 0;
 
 	inventory[slot_index] = item_id;
 	return 1;
+}
+
+int clear_item(int slot_index) {
+	return set_item(slot_index, NULL);
 }
 
 int count_items(int item_id) {
@@ -344,7 +338,7 @@ void menu_set_item() {
 	int old_item = inventory[slot_index];
 
 	print_id_to_item();
-	int item_id = get_int_input_range("Введите айдишник желаемого предмета", 1, UNIQUE_ITEMS_COUNT - 1);
+	int item_id = get_int_input_range("Введите айдишник желаемого предмета", 1, MAX_ITEMS_COUNT - 1);
 	
 	if (old_item == 0)
 		printf("Устанавливаю предмет %s в слот %d...", item_id_to_name[item_id], slot_index);
@@ -364,13 +358,13 @@ void menu_drop_item() {
 	else
 		printf("Выбрасываю предмет %s из слота %d...", item_id_to_name[old_item], slot_index);
 
-	set_item(slot_index, ITEM_EMPTY);
+	clear_item(slot_index);
 	printf("\n\n");
 }
 
 void menu_inventory_revision() {
 	print_id_to_item();
-	int item_id = get_int_input_range("Введите айдишник предмета для ревизии", 1, UNIQUE_ITEMS_COUNT - 1);
+	int item_id = get_int_input_range("Введите айдишник предмета для ревизии", 1, MAX_ITEMS_COUNT - 1);
 
 	int items_count = count_items(item_id);
 	
@@ -400,4 +394,40 @@ void menu_inventory_revision() {
 	printf("\n\n");
 	
 
+}
+
+
+char* get_string_from_file(FILE* file) {
+	//Размер файла в байтах
+	fseek(file, 0, SEEK_END);
+	long size = ftell(file);
+	rewind(file);
+	//
+
+	char* result = malloc(size + 1); // +1 для теремнатора
+	fread(result, sizeof(char), size, file);
+	result[size] = '\0';
+	return result;
+}
+
+
+void parse_config(const char* filepath, char** keys, char** values) {
+	FILE* file = fopen(filepath, "r");
+	if (file == NULL) {
+		printf("Ошибка: не удалось открыть файл %s\n", filepath);
+	}
+	else {
+
+		char* content = get_string_from_file(file);
+		printf(content);
+
+		int i = 0;
+		while (content[i] != '\0') {
+			
+		}
+
+		free(content);
+
+		fclose(file);
+	}
 }
