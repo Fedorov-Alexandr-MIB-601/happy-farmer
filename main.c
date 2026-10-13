@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <locale.h>
+#include <Windows.h>
 
+
+// Пункты выбора в меню
 #define SELECTION_EXIT 0
 #define SELECTION_CHECK_TIME 1
 #define SELECTION_WORK 2
@@ -14,32 +17,19 @@
 
 
 
-const int HOURS_IN_DAY = 24;
 
-const int START_DAY = 1;
+//		----	ПЕРЕМЕННЫЕ		----
 int current_day;
-
-const int START_HOUR = 8;
 int current_hour;
 
 #define INVENTORY_SIZE 10
 int inventory[INVENTORY_SIZE];
 
+const char username[64];
 
+
+// Было бы классно избавиться от этого и загружать всё из файлика
 const int UNIQUE_ITEMS_COUNT = 10;
-/* item_ids
- * 
- * 0 - Пусто
- * 1 - Дерево
- * 2 - Камень
- * 3 - Семена
- * 4 - Лопата
- * 5 - Лейка
- * 6 - Лукошко
- * 7 - Яблоко
- * 8 - Морковка
- * 9 - Ягода
- */
 const char item_id_to_name[][64] = {
 	"Пусто",
 	"Дерево",
@@ -62,27 +52,21 @@ const char item_id_to_name[][64] = {
 #define ITEM_APPLE 7
 #define ITEM_CARROT 8
 #define ITEM_BERRY 9
+//
 
 
 
-void init_variables() 
-{
-	 current_day = START_DAY;
-	 current_hour = START_HOUR;
 
-	 inventory[0] = ITEM_SHOVEL;
-	 inventory[1] = ITEM_WATERING_CAN;
-	 inventory[2] = ITEM_SEEDS;
-	 inventory[3] = ITEM_SEEDS;
 
-	 inventory[7] = ITEM_CARROT;
-	 inventory[8] = ITEM_CARROT;
-	 inventory[9] = ITEM_APPLE;
-}
 
 //		----	Функции сепарации логики		----
 void setup();
 int loop(); //Вернуть 0, если хочешь оборвать вечный цикл
+
+//		----	Функции инициализации			----
+void init_variables();
+void ask_username();
+
 
 //		----	Функции для помощи при выводе	----
 void print_action_selection();
@@ -107,13 +91,14 @@ void menu_drop_item();
 void menu_inventory_revision();
 
 int main() 
-{   
-	setlocale(LC_ALL, ".UTF8"); //Тимофей Владиславович сказал, это надо чтобы было без кракозябр в выводе
+{
+	SetConsoleCP(65001);
+	SetConsoleOutputCP(65001); //Тимофей Владиславович сказал, это надо чтобы было без кракозябр в выводе
 	printf("Happy Farmer v0.02\n\n");
 	
 	setup();
 	
-	//Вот это я смешную конструкцию придумал
+	//Вот это я смешную конструкцию придумал 🤣
 	while (loop());
 
 
@@ -122,7 +107,56 @@ int main()
 
 void setup() {
 	init_variables();
+	ask_username();
 }
+
+
+const int START_DAY = 1;
+const int START_HOUR = 8;
+void init_variables()
+{
+	current_day = START_DAY;
+	current_hour = START_HOUR;
+
+	inventory[0] = ITEM_SHOVEL;
+	inventory[1] = ITEM_WATERING_CAN;
+	inventory[2] = ITEM_SEEDS;
+	inventory[3] = ITEM_SEEDS;
+
+	inventory[7] = ITEM_CARROT;
+	inventory[8] = ITEM_CARROT;
+	inventory[9] = ITEM_APPLE;
+}
+
+void remove_newlines(char* str) {
+	if (str == NULL)
+		return;
+
+	int original = 0;
+	int edited = 0;
+
+	while (str[original] != '\0') {
+		if (str[original] != '\n' && str[original] != '\r') { //я за crlf
+			str[edited] = str[original];
+			edited++;
+		}
+		original++;
+	}
+	str[edited] = '\0';
+}
+
+
+
+void ask_username() {
+	char buffer[64];
+	printf("Привет, меня зовут Ёжик. А как зовут тебя?\nНапиши своё имя и фамилию, чтобы мы тебя узнавали:\n>>>");
+	fgets(buffer, sizeof(buffer), stdin);
+	remove_newlines(buffer);
+	strncpy(username, buffer, sizeof(username) - 1);
+	printf("Ого! Я тебя узнал!\n\n\n");
+
+}
+
 
 int loop() {
 	print_action_selection();
@@ -208,7 +242,8 @@ int get_int_input_range(char* message, int lowest_value, int highest_value)
 
 void print_action_selection()
 {
-	printf("Выберите действие:\n");
+	
+	printf("Что ты выберешь, %s?\n", username);
 	printf("[0] - Выход\n");
 	printf("[1] - Посмотреть на часы\n");
 	printf("[2] - Поработать\n");
@@ -238,10 +273,11 @@ void print_id_to_item() {
 
 }
 
+const int HOURS_IN_DAY = 24;
 void feed_forward_time(int hours_to_skip) {
 	current_hour += hours_to_skip;
 	int days_passed = current_hour / HOURS_IN_DAY;
-	current_hour %= 24;
+	current_hour %= HOURS_IN_DAY;
 	current_day += days_passed;
 }
 
