@@ -104,7 +104,7 @@ void menu_inventory_revision();
 
 int main() 
 {   
-	setlocale(LC_ALL, "ru_RU.UTF-8"); //нейронка сказала, это надо чтобы было без кракозябр в выводе
+	setlocale(LC_ALL, ".UTF8"); //нейронка сказала, это надо чтобы было без кракозябр в выводе
 
 	printf("Happy Farmer v0.01\n\n");
 	
