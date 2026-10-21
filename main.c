@@ -32,7 +32,7 @@ const char username[64];
 
 #define MAX_ITEMS_COUNT 10
 #define MAX_TOKEN_LENGTH 64
-const char item_id_to_name[MAX_ITEMS_COUNT][MAX_TOKEN_LENGTH] = {
+char item_id_to_name[MAX_ITEMS_COUNT][MAX_TOKEN_LENGTH] = {
 	"Пусто",
 	"Дерево",
 	"Камень",
@@ -52,7 +52,7 @@ const char item_id_to_name[MAX_ITEMS_COUNT][MAX_TOKEN_LENGTH] = {
 
 
 //		----	Функции сепарации логики		----
-void setup();
+int setup();
 int loop(); //Вернуть 0, если хочешь оборвать вечный цикл
 
 //		----	Функции инициализации			----
@@ -72,7 +72,7 @@ void show_time() {
 
 
 //		----	Функции для работы с файлами	----
-int parse_config(const char* filepath, char** keys, char** values);
+int parse_config(const char* filepath, char** keys, char** values, int* pairs_count);
 
 //		----	Геймплейные функции				----
 void feed_forward_time(int hours_to_skip);
@@ -93,7 +93,9 @@ int main()
 	SetConsoleOutputCP(65001); //Тимофей Владиславович сказал, это надо чтобы было без кракозябр в выводе
 	printf("Happy Farmer v0.02\n\n");
 	
-	setup();
+	if (setup() != 0) {
+		return 1;
+	}
 	
 	//Вот это я смешную конструкцию придумал 🤣
 	while (loop());
@@ -102,10 +104,39 @@ int main()
 	return 0;
 }
 
-void setup() {
-	parse_config("assets/items.txt", NULL, NULL);
+int load_items() {
+	printf("Загружаю предметы...\n");
+	char** keys;
+	char** values;
+	int pairs_count;
+
+	if (parse_config("assets/items.txt", &keys, &values, &pairs_count)) {
+		printf("Ошибка загрузки предметов!\n");
+		return 1;
+	}
+
+	for (int i = 0; i < pairs_count; i++)
+	{
+		int index = atoi(keys[i]);
+		strcpy(item_id_to_name[index], values[i]);
+		free(keys[i]);
+	}
+	free(keys);
+	for (int i = 0; i < pairs_count; i++)
+	{
+		free(values[i]);
+	}
+	free(values);
+	return 0;
+}
+
+int setup() {
+	if (load_items()) {
+		return 1;
+	}
 	init_variables();
 	ask_username();
+	return 0;
 }
 
 
@@ -420,7 +451,7 @@ int check_config(const char* config, int* pairs_count) {
 	int i = 0;
 	while (config[i] != '\0') {
 		if (token_length_counter == MAX_TOKEN_LENGTH) {
-			printf("Ошибка: длина токена слишком большая");
+			printf("Ошибка: длина токена слишком большая\n");
 			return 1;
 		}
 
@@ -430,22 +461,24 @@ int check_config(const char* config, int* pairs_count) {
 				token_length_counter = 0;
 			}
 			else {
-				printf("Ошибка: ожидалось ',' но получил '=' в файле");
+				printf("Ошибка: ожидалось ';' но получил '='\n");
 				return 2;
 			}
 		}
-		else if (config[i] == ',') {
+		else if (config[i] == ';') {
 			if (equals_counter > comma_counter) {
 				comma_counter++;
 				token_length_counter = 0;
 			}
 			else {
-				printf("Ошибка: ожидалось '=' но получил ',' в файле");
+				printf("Ошибка: ожидалось '=' но получил ';'\n");
 				return 3;
 			}
 		}
 		else {
-			token_length_counter++;
+			if (config[i] != '\n' && config[i] != '\r') {
+				token_length_counter++;
+			}
 		}
 
 		i++;
@@ -454,8 +487,8 @@ int check_config(const char* config, int* pairs_count) {
 	return 0;
 }
 
-
-int parse_config(const char* filepath, char** keys, char** values) {
+//Изначально я хотел передавать по двум звёздочкам **, но что-то у меня не получилось и пришлось использовать три *** 😥
+int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_count) { 
 	FILE* file = fopen(filepath, "r");
 	if (file == NULL) {
 		printf("Ошибка: не удалось открыть файл %s\n", filepath);
@@ -465,21 +498,22 @@ int parse_config(const char* filepath, char** keys, char** values) {
 
 		char* content = get_string_from_file(file);
 		
-		int pairs_count = -1;
+		int _pairs_count = -1;
 		//Проверка корректности нотации
-		if (check_config(content, &pairs_count)) {
+		if (check_config(content, &_pairs_count)) {
 			return 1;
 		}
-		
-		keys = malloc(sizeof(char*) * pairs_count);
-		for (int i = 0; i < pairs_count; i++)
+		*pairs_count = _pairs_count;
+
+		*keys = malloc(sizeof(char*) * _pairs_count);
+		for (int i = 0; i < _pairs_count; i++)
 		{
-			keys[i] = malloc(sizeof(char) * MAX_TOKEN_LENGTH);
+			(*keys)[i] = malloc(sizeof(char) * MAX_TOKEN_LENGTH);
 		}
-		values = malloc(sizeof(char*) * pairs_count);
-		for (int i = 0; i < pairs_count; i++)
+		*values = malloc(sizeof(char*) * _pairs_count);
+		for (int i = 0; i < _pairs_count; i++)
 		{
-			values[i] = malloc(sizeof(char) * MAX_TOKEN_LENGTH);
+			(*values)[i] = malloc(sizeof(char) * MAX_TOKEN_LENGTH);
 		}
 
 		
@@ -488,66 +522,43 @@ int parse_config(const char* filepath, char** keys, char** values) {
 		int token_length_counter = 0;
 		int i = 0;
 		while (content[i] != '\0') {
-			if (token_length_counter == MAX_TOKEN_LENGTH) {
-				printf("Ошибка: длина токена слишком большая");
-				return 1;
-			}
-
 			if (content[i] == '=') {
-				if (comma_counter == equals_counter) {
-					equals_counter++;
-					token_length_counter = 0;
-				}
-				else {
-					printf("Ошибка: ожидалось ',' но получил '=' в файле");
-					return 2;
-				}
+				(*keys)[comma_counter][token_length_counter] = '\0';
+				equals_counter++;
+				token_length_counter = 0;
+				
 			}
-			else if (content[i] == ',') {
-				if (equals_counter > comma_counter) {
-					comma_counter++;
-					token_length_counter = 0;
-				}
-				else {
-					printf("Ошибка: ожидалось '=' но получил ',' в файле");
-					return 3;
+			else if (content[i] == ';') {
+				(*values)[comma_counter][token_length_counter] = '\0';
+				comma_counter++;
+				token_length_counter = 0;
+				if (comma_counter == _pairs_count) {
+					break;
 				}
 			}
 			else {
-				if (content[i] != '\n') {
+				if (content[i] != '\n' && content[i] != '\r') {
 					if (comma_counter == equals_counter) { //Левая часть
-						keys[comma_counter][token_length_counter] = content[i];
+						(*keys)[comma_counter][token_length_counter] = content[i];
 					}
 					else if (comma_counter + 1 == equals_counter) { //Правая часть
-						values[comma_counter][token_length_counter] = content[i];
+						(*values)[comma_counter][token_length_counter] = content[i];
 					}
+					token_length_counter++;
 				}
 
-				token_length_counter++;
+				
 			}
 
 
 			i++;
 		}
 
-		
-		for (int i = 0; i < pairs_count; i++)
-		{
-			printf("%s = %s", keys[i], values[i]);
-			printf("\n");
-			free(keys[i]);
-		}
-		free(keys);
-		for (int i = 0; i < pairs_count; i++)
-		{
-			free(values[i]);
-		}
-		free(values);
-
 
 		free(content);
 
 		fclose(file);
 	}
+	
 	return 0;
 }
