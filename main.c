@@ -118,7 +118,8 @@ int load_items() {
 	for (int i = 0; i < pairs_count; i++)
 	{
 		int index = atoi(keys[i]);
-		strcpy(item_id_to_name[index], values[i]);
+		if (index >= 0 && index < MAX_ITEMS_COUNT) //Пришлось добавить, потому что мне почему-то никто не сказал, что я залез в чужую память, например в 10 индекс, странно
+			strcpy(item_id_to_name[index], values[i]);
 		free(keys[i]);
 	}
 	free(keys);
