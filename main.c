@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <Windows.h>
-
+#include <string.h>
 
 // Пункты выбора в меню
 #define SELECTION_EXIT 0
@@ -31,8 +31,8 @@ const char username[64];
 // Было бы классно избавиться от этого и загружать всё из файлика
 
 #define MAX_ITEMS_COUNT 10
-#define MAX_ITEM_NAME 64
-const char item_id_to_name[MAX_ITEMS_COUNT][MAX_ITEM_NAME] = {
+#define MAX_TOKEN_LENGTH 64
+const char item_id_to_name[MAX_ITEMS_COUNT][MAX_TOKEN_LENGTH] = {
 	"Пусто",
 	"Дерево",
 	"Камень",
@@ -72,7 +72,7 @@ void show_time() {
 
 
 //		----	Функции для работы с файлами	----
-void parse_config(const char* filepath, char** keys, char** values);
+int parse_config(const char* filepath, char** keys, char** values);
 
 //		----	Геймплейные функции				----
 void feed_forward_time(int hours_to_skip);
@@ -410,24 +410,144 @@ char* get_string_from_file(FILE* file) {
 	return result;
 }
 
+//возвращает 0 если всё ок, иначе код ошибки
+int check_config(const char* config, int* pairs_count) {
+	int equals_counter = 0; //По сути количество пар ключ/значение
+	int comma_counter = 0;
+	int token_length_counter = 0;
 
-void parse_config(const char* filepath, char** keys, char** values) {
+	
+	int i = 0;
+	while (config[i] != '\0') {
+		if (token_length_counter == MAX_TOKEN_LENGTH) {
+			printf("Ошибка: длина токена слишком большая");
+			return 1;
+		}
+
+		if (config[i] == '=') {
+			if (comma_counter == equals_counter) {
+				equals_counter++;
+				token_length_counter = 0;
+			}
+			else {
+				printf("Ошибка: ожидалось ',' но получил '=' в файле");
+				return 2;
+			}
+		}
+		else if (config[i] == ',') {
+			if (equals_counter > comma_counter) {
+				comma_counter++;
+				token_length_counter = 0;
+			}
+			else {
+				printf("Ошибка: ожидалось '=' но получил ',' в файле");
+				return 3;
+			}
+		}
+		else {
+			token_length_counter++;
+		}
+
+		i++;
+	}
+	*pairs_count = equals_counter;
+	return 0;
+}
+
+
+int parse_config(const char* filepath, char** keys, char** values) {
 	FILE* file = fopen(filepath, "r");
 	if (file == NULL) {
 		printf("Ошибка: не удалось открыть файл %s\n", filepath);
+		return 1;
 	}
 	else {
 
 		char* content = get_string_from_file(file);
-		printf(content);
+		
+		int pairs_count = -1;
+		//Проверка корректности нотации
+		if (check_config(content, &pairs_count)) {
+			return 1;
+		}
+		
+		keys = malloc(sizeof(char*) * pairs_count);
+		for (int i = 0; i < pairs_count; i++)
+		{
+			keys[i] = malloc(sizeof(char) * MAX_TOKEN_LENGTH);
+		}
+		values = malloc(sizeof(char*) * pairs_count);
+		for (int i = 0; i < pairs_count; i++)
+		{
+			values[i] = malloc(sizeof(char) * MAX_TOKEN_LENGTH);
+		}
 
+		
+		int equals_counter = 0;
+		int comma_counter = 0;
+		int token_length_counter = 0;
 		int i = 0;
 		while (content[i] != '\0') {
-			
+			if (token_length_counter == MAX_TOKEN_LENGTH) {
+				printf("Ошибка: длина токена слишком большая");
+				return 1;
+			}
+
+			if (content[i] == '=') {
+				if (comma_counter == equals_counter) {
+					equals_counter++;
+					token_length_counter = 0;
+				}
+				else {
+					printf("Ошибка: ожидалось ',' но получил '=' в файле");
+					return 2;
+				}
+			}
+			else if (content[i] == ',') {
+				if (equals_counter > comma_counter) {
+					comma_counter++;
+					token_length_counter = 0;
+				}
+				else {
+					printf("Ошибка: ожидалось '=' но получил ',' в файле");
+					return 3;
+				}
+			}
+			else {
+				if (content[i] != '\n') {
+					if (comma_counter == equals_counter) { //Левая часть
+						keys[comma_counter][token_length_counter] = content[i];
+					}
+					else if (comma_counter + 1 == equals_counter) { //Правая часть
+						values[comma_counter][token_length_counter] = content[i];
+					}
+				}
+
+				token_length_counter++;
+			}
+
+
+			i++;
 		}
+
+		
+		for (int i = 0; i < pairs_count; i++)
+		{
+			printf("%s = %s", keys[i], values[i]);
+			printf("\n");
+			free(keys[i]);
+		}
+		free(keys);
+		for (int i = 0; i < pairs_count; i++)
+		{
+			free(values[i]);
+		}
+		free(values);
+
 
 		free(content);
 
 		fclose(file);
 	}
+	return 0;
 }
