@@ -13,6 +13,7 @@
 #define SELECTION_INVENTORY_REVISION 6
 #define SELECTION_INVENTORY_SEARCH 7
 #define SELECTION_MAKE_SNAPSHOT 8
+#define SELECTION_SETTINGS_PARSER 9
 
 
 
@@ -110,6 +111,7 @@ void menu_drop_item();
 void menu_inventory_revision();
 void menu_inventory_search();
 void menu_make_snapshot();
+void menu_settings_parser();
 
 int main() 
 {
@@ -255,6 +257,9 @@ int loop() {
 		break;
 	case SELECTION_MAKE_SNAPSHOT:
 		menu_make_snapshot();
+		break;
+	case SELECTION_SETTINGS_PARSER:
+		menu_settings_parser();
 		break;
 	default:
 		printf("Такого действия нет!\n");
@@ -586,6 +591,10 @@ void menu_make_snapshot() {
 
 }
 
+void menu_settings_parser() {
+
+}
+
 
 //Всё что ниже по-хорошему надобно в отдельный файл
 
@@ -622,18 +631,19 @@ int check_config(const char* config, int* pairs_count) {
 				token_length_counter = 0;
 			}
 			else {
-				printf("Ошибка: ожидалось ';' но получил '='\n");
+				printf("Ошибка: ожидалось 'newline' но получил '='\n");
 				return 2;
 			}
 		}
-		else if (config[i] == ';') {
+		else if (config[i] == '\n') {
 			if (equals_counter > comma_counter) {
 				comma_counter++;
 				token_length_counter = 0;
 			}
 			else {
-				printf("Ошибка: ожидалось '=' но получил ';'\n");
-				return 3;
+				//printf("Ошибка: ожидалось '=' но получил 'newline'\n");
+				//return 3;
+				//По идее можно просто игнорить
 			}
 		}
 		else {
@@ -679,31 +689,33 @@ int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_
 
 		
 		int equals_counter = 0;
-		int comma_counter = 0;
+		int newline_counter = 0;
 		int token_length_counter = 0;
 		int i = 0;
 		while (content[i] != '\0') {
 			if (content[i] == '=') {
-				(*keys)[comma_counter][token_length_counter] = '\0';
+				(*keys)[newline_counter][token_length_counter] = '\0';
 				equals_counter++;
 				token_length_counter = 0;
 				
 			}
-			else if (content[i] == ';') {
-				(*values)[comma_counter][token_length_counter] = '\0';
-				comma_counter++;
-				token_length_counter = 0;
-				if (comma_counter == _pairs_count) {
-					break;
+			else if (content[i] == '\n') {
+				if (equals_counter > newline_counter) {
+					(*values)[newline_counter][token_length_counter] = '\0';
+					newline_counter++;
+					token_length_counter = 0;
+					if (newline_counter == _pairs_count) {
+						break;
+					}
 				}
 			}
 			else {
 				if (content[i] != '\n' && content[i] != '\r') {
-					if (comma_counter == equals_counter) { //Левая часть
-						(*keys)[comma_counter][token_length_counter] = content[i];
+					if (newline_counter == equals_counter) { //Левая часть
+						(*keys)[newline_counter][token_length_counter] = content[i];
 					}
-					else if (comma_counter + 1 == equals_counter) { //Правая часть
-						(*values)[comma_counter][token_length_counter] = content[i];
+					else if (newline_counter + 1 == equals_counter) { //Правая часть
+						(*values)[newline_counter][token_length_counter] = content[i];
 					}
 					token_length_counter++;
 				}
