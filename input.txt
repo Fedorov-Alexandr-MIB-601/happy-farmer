@@ -1,7 +1,7 @@
 
 
 #Наисложнейшая сложность сложностей
-difficulty=extreme_demon
+difficulty=Extreme Demon
 
 rain_chance=77 #топорики
 

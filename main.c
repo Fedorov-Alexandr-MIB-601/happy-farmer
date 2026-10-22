@@ -618,8 +618,12 @@ void menu_settings_parser() {
 		return;
 	}
 
+	FILE* stream = stdout;
+
+	printf("---- Чистая Таблица Настроек: ----\n\n");
 	for (int i = 0; i < pairs_count; i++)
 	{
+		fprintf(stream, "Параметр: '%s'\t| Значение: '%s'\n", keys[i], values[i]);
 		free(keys[i]);
 	}
 	free(keys);
@@ -628,6 +632,7 @@ void menu_settings_parser() {
 		free(values[i]);
 	}
 	free(values);
+
 }
 
 
