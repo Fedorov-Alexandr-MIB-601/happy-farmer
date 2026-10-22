@@ -109,6 +109,7 @@ void menu_set_item();
 void menu_drop_item();
 void menu_inventory_revision();
 void menu_inventory_search();
+void menu_make_snapshot();
 
 int main() 
 {
@@ -218,7 +219,7 @@ void ask_username() {
 int loop() {
 	redraw_to_header();
 	print_action_selection();
-	int user_selection = get_int_input_range("", 0, 7);
+	int user_selection = get_int_input_range("", 0, 8);
 	redraw_to_header();
 
 	switch (user_selection)
@@ -251,6 +252,9 @@ int loop() {
 		break;
 	case SELECTION_INVENTORY_SEARCH:
 		menu_inventory_search();
+		break;
+	case SELECTION_MAKE_SNAPSHOT:
+		menu_make_snapshot();
 		break;
 	default:
 		printf("Такого действия нет!\n");
@@ -554,10 +558,34 @@ void menu_inventory_search() {
 			printf(" %d,", i);
 		}
 	}
+}
 
 
+
+void menu_make_snapshot() {
+	//На экран и в файл
+	FILE* fp = fopen("diary.txt", "a");
+	FILE* stream = stdout;
+	for (int i = 0; i < 2; i++) {
+		fprintf(stream, "---- Зпись от %d дня в %s ----\n", current_day, get_military_time(current_hour));
+		fprintf(stream, "Фермер по имени   %s   имеет у себя в рюкзаке:\n", username);
+		for (int item_id = 1; item_id < MAX_ITEMS_COUNT; item_id++)
+		{
+			int items_count = count_items(item_id);
+			if (items_count == 0) continue;
+			fprintf(stream, "- %s \tв количестве %d шт.\n", item_id_to_name[item_id], items_count);
+		}
+		fprintf(stream, "\n\n\n");
+
+		if (i == 1) break;
+		stream = fp;
+	}
+	
+	fclose(fp);
+	
 
 }
+
 
 //Всё что ниже по-хорошему надобно в отдельный файл
 
