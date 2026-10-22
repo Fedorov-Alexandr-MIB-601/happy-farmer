@@ -11,10 +11,17 @@
 #define SELECTION_SET_ITEM 4
 #define SELECTION_DROP_ITEM 5
 #define SELECTION_INVENTORY_REVISION 6
+#define SELECTION_INVENTORY_SEARCH 7
+#define SELECTION_MAKE_SNAPSHOT 8
 
 
 
 
+
+#define MAX_ITEMS_COUNT 10
+#define MAX_TOKEN_LENGTH 64
+
+char username[MAX_TOKEN_LENGTH];
 
 
 
@@ -25,13 +32,8 @@ int current_hour;
 #define INVENTORY_SIZE 10
 int inventory[INVENTORY_SIZE];
 
-const char username[64];
 
 
-// Было бы классно избавиться от этого и загружать всё из файлика
-
-#define MAX_ITEMS_COUNT 10
-#define MAX_TOKEN_LENGTH 64
 char item_id_to_name[MAX_ITEMS_COUNT][MAX_TOKEN_LENGTH] = {
 	"Пусто",
 	"Дерево",
@@ -75,12 +77,14 @@ void redraw_to_header() {
 	print_title();
 }
 void print_action_selection();
-int get_int_input(char* message);
-int get_int_input_range(char* message, int lowest_value, int highest_value);
+int get_int_input(const char* message);
+int get_int_input_range(const char* message, int lowest_value, int highest_value);
+void get_string_input(const char* message, char* buffer);
 void get_confirm() {
-	printf("\nОжидание подтверждения...\n");
+	printf("\nОжидание подтверждения...");
 	_getch();
 }
+
 
 char* get_military_time(int hour);
 void print_id_to_item();
@@ -104,6 +108,7 @@ void menu_check_inventory();
 void menu_set_item();
 void menu_drop_item();
 void menu_inventory_revision();
+void menu_inventory_search();
 
 int main() 
 {
@@ -158,8 +163,10 @@ int setup() {
 		return 1;
 	}
 	init_variables();
+
 	redraw_to_header();
 	ask_username();
+
 	get_confirm();
 	return 0;
 }
@@ -171,7 +178,10 @@ void init_variables()
 {
 	current_day = START_DAY;
 	current_hour = START_HOUR;
-
+	for (int i = 0; i < INVENTORY_SIZE; i++)
+	{
+		inventory[i] = rand() % MAX_ITEMS_COUNT;
+	}
 }
 
 void remove_newlines(char* str) {
@@ -182,7 +192,7 @@ void remove_newlines(char* str) {
 	int edited = 0;
 
 	while (str[original] != '\0') {
-		if (str[original] != '\n' && str[original] != '\r') { //я за crlf
+		if (str[original] != '\n' && str[original] != '\r') {
 			str[edited] = str[original];
 			edited++;
 		}
@@ -194,20 +204,21 @@ void remove_newlines(char* str) {
 
 
 void ask_username() {
-	char buffer[64];
-	printf("Привет, меня зовут Ёжик. А как зовут тебя?\nНапиши своё имя и фамилию, чтобы мы тебя узнавали:\n>>>");
-	fgets(buffer, sizeof(buffer), stdin);
-	remove_newlines(buffer);
-	strncpy(username, buffer, sizeof(username) - 1);
-	printf("Ого! Я тебя узнал!\n\n\n");
-
+	get_string_input("Привет, меня зовут Ёжик. А как зовут тебя?\nНапиши своё имя и фамилию, чтобы мы тебя узнавали:", (char*)username);
+	if (strcmp(username, "") == 0)
+	{
+		printf("Значит будешь Анонимом.\n");
+		strcpy(username, "Аноним");
+	}
+	else
+		printf("Ого! Я тебя узнал!\n");
 }
 
 
 int loop() {
 	redraw_to_header();
 	print_action_selection();
-	int user_selection = get_int_input_range("", 0, 6);
+	int user_selection = get_int_input_range("", 0, 7);
 	redraw_to_header();
 
 	switch (user_selection)
@@ -238,6 +249,9 @@ int loop() {
 	case SELECTION_INVENTORY_REVISION:
 		menu_inventory_revision();
 		break;
+	case SELECTION_INVENTORY_SEARCH:
+		menu_inventory_search();
+		break;
 	default:
 		printf("Такого действия нет!\n");
 		break;
@@ -248,7 +262,7 @@ int loop() {
 
 
 
-int get_int_input(char* message)
+int get_int_input(const char* message)
 {
 	while (1)
 	{
@@ -266,7 +280,7 @@ int get_int_input(char* message)
 	return -1;
 }
 
-int get_int_input_range(char* message, int lowest_value, int highest_value)
+int get_int_input_range(const char* message, int lowest_value, int highest_value)
 {
 	while(1)
 	{
@@ -289,6 +303,58 @@ int get_int_input_range(char* message, int lowest_value, int highest_value)
 	return -1;
 }
 
+void get_string_input_old(const char* message, char* destination_buffer) {
+	if (destination_buffer == NULL) return;
+
+	printf("%s\n>>>", message);
+
+	if (fgets(destination_buffer, MAX_TOKEN_LENGTH, stdin) != NULL) {
+		// Если символ перевода строки НЕ поместился — чистим остаток потока stdin
+		if (strchr(destination_buffer, '\n') == NULL) {
+			int c;
+			while ((c = getchar()) != '\n' && c != EOF);
+		}
+		// Удаляем сам '\n'
+		remove_newlines(destination_buffer);
+	}
+}
+
+void get_string_input(const char* message, char* destination_buffer) {
+	if (destination_buffer == NULL) return;
+
+	printf("%s\n>>> ", message);
+	//Опять что-ли себе на комп линукс поставить???
+#ifdef _WIN32
+	// На Windows читаем в UTF-16, чтобы консоль не ломала кириллицу
+	HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+	wchar_t wbuffer[512];
+	DWORD charsRead = 0;
+
+	// Читаем из консоли Windows
+	if (ReadConsoleW(hStdin, wbuffer, sizeof(wbuffer) / sizeof(wchar_t) - 1, &charsRead, NULL)) {
+		wbuffer[charsRead] = L'\0';
+
+		// Конвертируем прочитанную широкую строку (UTF-16) в UTF-8
+		WideCharToMultiByte(CP_UTF8, 0, wbuffer, -1, destination_buffer, MAX_TOKEN_LENGTH, NULL, NULL);
+	}
+	else {
+		// Запасной вариант (если ввод был перенаправлен из файла, а не из реальной консоли)
+		if (fgets(destination_buffer, MAX_TOKEN_LENGTH, stdin) == NULL) {
+			destination_buffer[0] = '\0';
+		}
+	}
+#else
+	// На Linux / macOS fgets работает с UTF-8 идеально
+	if (fgets(destination_buffer, (int)max_size, stdin) == NULL) {
+		destination_buffer[0] = '\0';
+	}
+#endif
+
+	// Убираем \r и \n на конце
+	remove_newlines(destination_buffer);
+}
+
+
 void print_action_selection()
 {
 	
@@ -300,6 +366,8 @@ void print_action_selection()
 	printf("[4] - Положить предмет в слот\n");
 	printf("[5] - Выбросить предмет\n");
 	printf("[6] - Ревизия ресурсов\n");
+	printf("[7] - Поиск предмета в рюкзаке по названию\n");
+	printf("[8] - Записать состояние в дневник фермера\n");
 	
 }
 
@@ -454,7 +522,44 @@ void menu_inventory_revision() {
 	
 
 }
+int get_item_index_by_name(char* item_name) {
+	for (int i = 0; i < MAX_ITEMS_COUNT; i++)
+	{
+		if (strcmp(item_id_to_name[i], item_name) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+void menu_inventory_search() {
+	char search_bar[MAX_TOKEN_LENGTH];
+	print_id_to_item();
+	get_string_input("Введите название искомого предмета", search_bar);
+	int item_id = get_item_index_by_name(search_bar);
+	if (item_id == -1) {
+		printf("Такого предмета не существует!\n");
+		return;
+	}
+	int items_count = count_items(item_id);
 
+	if (items_count == 0) {
+		printf("У меня нет такого предмета(\n");
+		return;
+	}
+
+	printf("Предметы типа '%s' лежат в слотах:", search_bar);
+	for (int i = 0; i < INVENTORY_SIZE; i++)
+	{
+		if (inventory[i] == item_id) {
+			printf(" %d,", i);
+		}
+	}
+
+
+
+}
+
+//Всё что ниже по-хорошему надобно в отдельный файл
 
 char* get_string_from_file(FILE* file) {
 	//Размер файла в байтах
