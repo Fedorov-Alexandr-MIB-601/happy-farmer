@@ -61,9 +61,27 @@ void ask_username();
 
 
 //		----	Функции для помощи при выводе	----
+void clear_screen() {
+	system("cls");
+}
+void print_title() {
+	printf("|-------------------------------|\n");
+	printf("| H A P P Y   F A R M E R v0.02 |\n");
+	printf("|-------------------------------|\n");
+	printf("\n");
+}
+void redraw_to_header() {
+	clear_screen();
+	print_title();
+}
 void print_action_selection();
 int get_int_input(char* message);
 int get_int_input_range(char* message, int lowest_value, int highest_value);
+void get_confirm() {
+	printf("\nОжидание подтверждения...\n");
+	_getch();
+}
+
 char* get_military_time(int hour);
 void print_id_to_item();
 void show_time() {
@@ -91,7 +109,7 @@ int main()
 {
 	SetConsoleCP(65001);
 	SetConsoleOutputCP(65001); //Тимофей Владиславович сказал, это надо чтобы было без кракозябр в выводе
-	printf("Happy Farmer v0.02\n\n");
+	redraw_to_header();
 	
 	if (setup() != 0) {
 		return 1;
@@ -118,7 +136,10 @@ int load_items() {
 	for (int i = 0; i < pairs_count; i++)
 	{
 		int index = atoi(keys[i]);
-		if (index >= 0 && index < MAX_ITEMS_COUNT) //Пришлось добавить, потому что мне почему-то никто не сказал, что я залез в чужую память, например в 10 индекс, странно
+
+		//Пришлось добавить проверку, потому что мне почему-то никто не сказал, что я залез в чужую память, например в 10 индекс, странно
+		//Кажется ошбки не было, потому что я залез не в память чужой программы, а своей же
+		if (index >= 0 && index < MAX_ITEMS_COUNT) 
 			strcpy(item_id_to_name[index], values[i]);
 		free(keys[i]);
 	}
@@ -128,6 +149,7 @@ int load_items() {
 		free(values[i]);
 	}
 	free(values);
+	printf("Предметы успешно загружены...\n");
 	return 0;
 }
 
@@ -136,7 +158,9 @@ int setup() {
 		return 1;
 	}
 	init_variables();
+	redraw_to_header();
 	ask_username();
+	get_confirm();
 	return 0;
 }
 
@@ -181,8 +205,10 @@ void ask_username() {
 
 
 int loop() {
+	redraw_to_header();
 	print_action_selection();
 	int user_selection = get_int_input_range("", 0, 6);
+	redraw_to_header();
 
 	switch (user_selection)
 	{
@@ -216,6 +242,7 @@ int loop() {
 		printf("Такого действия нет!\n");
 		break;
 	}
+	get_confirm();
 	return 1;
 }
 
