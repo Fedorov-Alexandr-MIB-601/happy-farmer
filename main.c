@@ -3,6 +3,14 @@
 #include <Windows.h>
 #include <string.h>
 
+
+
+#define PARSER_EXIT_CODE_TOKEN_IS_TOO_LONG 1
+#define PARSER_EXIT_CODE_WRONG_FORMAT 2
+#define PARSER_EXIT_CODE_FAILED_OPEN_FILE 3
+#define PARSER_EXIT_CODE_EMPTY_TOKEN 4
+
+
 // Пункты выбора в меню
 #define SELECTION_EXIT 0
 #define SELECTION_CHECK_TIME 1
@@ -136,8 +144,9 @@ int load_items() {
 	char** values;
 	int pairs_count;
 
-	if (parse_config("assets/items.txt", &keys, &values, &pairs_count)) {
-		printf("Ошибка загрузки предметов!\n");
+	int exit_code = parse_config("assets/items.txt", &keys, &values, &pairs_count);
+	if (exit_code) {
+		printf("Ошибка загрузки предметов, %d\n", exit_code);
 		return 1;
 	}
 
@@ -149,6 +158,7 @@ int load_items() {
 		//Кажется ошбки не было, потому что я залез не в память чужой программы, а своей же
 		if (index >= 0 && index < MAX_ITEMS_COUNT) 
 			strcpy(item_id_to_name[index], values[i]);
+		
 		free(keys[i]);
 	}
 	free(keys);
@@ -221,7 +231,7 @@ void ask_username() {
 int loop() {
 	redraw_to_header();
 	print_action_selection();
-	int user_selection = get_int_input_range("", 0, 8);
+	int user_selection = get_int_input_range("", 0, 9);
 	redraw_to_header();
 
 	switch (user_selection)
@@ -377,6 +387,7 @@ void print_action_selection()
 	printf("[6] - Ревизия ресурсов\n");
 	printf("[7] - Поиск предмета в рюкзаке по названию\n");
 	printf("[8] - Записать состояние в дневник фермера\n");
+	printf("[9] - Парсер файла настроек\n");
 	
 }
 
@@ -591,8 +602,20 @@ void menu_make_snapshot() {
 
 }
 
-void menu_settings_parser() {
 
+
+
+
+void menu_settings_parser() {
+	printf("Изучаю настройки...\n");
+
+	char** keys;
+	char** values;
+	int pairs_count;
+	int exit_code = parse_config("input.txt", &keys, &values, &pairs_count);
+	if (exit_code == PARSER_EXIT_CODE_EMPTY_TOKEN) {
+		printf("Ошибка: Пустой ключ или значение");
+	}
 }
 
 
@@ -614,35 +637,45 @@ char* get_string_from_file(FILE* file) {
 //возвращает 0 если всё ок, иначе код ошибки
 int check_config(const char* config, int* pairs_count) {
 	int equals_counter = 0; //По сути количество пар ключ/значение
-	int comma_counter = 0;
+	int newline_counter = 0;
 	int token_length_counter = 0;
 
 	
+	unsigned char comment_ignore = 0;
+
 	int i = 0;
 	while (config[i] != '\0') {
 		if (token_length_counter == MAX_TOKEN_LENGTH) {
-			printf("Ошибка: длина токена слишком большая\n");
-			return 1;
+			return PARSER_EXIT_CODE_TOKEN_IS_TOO_LONG;
 		}
 
-		if (config[i] == '=') {
-			if (comma_counter == equals_counter) {
+		if (comment_ignore == TRUE)
+		{
+			if (config[i] == '\n') {
+				comment_ignore = FALSE;
+			}
+		}
+		else if (config[i] == '#') {
+			comment_ignore = TRUE;
+			token_length_counter = 0;
+		}
+		else if (config[i] == '=') {
+			if (newline_counter == equals_counter) {
 				equals_counter++;
 				token_length_counter = 0;
 			}
 			else {
-				printf("Ошибка: ожидалось 'newline' но получил '='\n");
-				return 2;
+				return PARSER_EXIT_CODE_WRONG_FORMAT;
 			}
 		}
 		else if (config[i] == '\n') {
-			if (equals_counter > comma_counter) {
-				comma_counter++;
+			if (equals_counter > newline_counter) {
+				newline_counter++;
 				token_length_counter = 0;
 			}
 			else {
 				//printf("Ошибка: ожидалось '=' но получил 'newline'\n");
-				//return 3;
+				//return ?;
 				//По идее можно просто игнорить
 			}
 		}
@@ -662,8 +695,7 @@ int check_config(const char* config, int* pairs_count) {
 int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_count) { 
 	FILE* file = fopen(filepath, "r");
 	if (file == NULL) {
-		printf("Ошибка: не удалось открыть файл %s\n", filepath);
-		return 1;
+		return PARSER_EXIT_CODE_FAILED_OPEN_FILE;
 	}
 	else {
 
@@ -671,9 +703,9 @@ int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_
 		
 		int _pairs_count = -1;
 		//Проверка корректности нотации
-		if (check_config(content, &_pairs_count)) {
-			return 1;
-		}
+		int exit_code = check_config(content, &_pairs_count);
+		if (exit_code) return exit_code;
+		
 		*pairs_count = _pairs_count;
 
 		*keys = malloc(sizeof(char*) * _pairs_count);
@@ -687,13 +719,32 @@ int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_
 			(*values)[i] = malloc(sizeof(char) * MAX_TOKEN_LENGTH);
 		}
 
-		
+		unsigned char comment_ignore = 0;
 		int equals_counter = 0;
 		int newline_counter = 0;
 		int token_length_counter = 0;
 		int i = 0;
 		while (content[i] != '\0') {
-			if (content[i] == '=') {
+			if (comment_ignore == TRUE)
+			{
+				if (content[i] == '\n') {
+					comment_ignore = FALSE;
+				}
+			}
+			else if (content[i] == '#') {
+				comment_ignore = TRUE;
+
+				if (newline_counter + 1 == equals_counter) { //Правая часть
+					if (token_length_counter == 0) return PARSER_EXIT_CODE_EMPTY_TOKEN;
+					(*values)[newline_counter][token_length_counter] = '\0';
+					newline_counter++;
+				}
+				token_length_counter = 0;
+				
+
+			}
+			else if (content[i] == '=') {
+				if (token_length_counter == 0) return PARSER_EXIT_CODE_EMPTY_TOKEN;
 				(*keys)[newline_counter][token_length_counter] = '\0';
 				equals_counter++;
 				token_length_counter = 0;
@@ -701,6 +752,7 @@ int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_
 			}
 			else if (content[i] == '\n') {
 				if (equals_counter > newline_counter) {
+					if (token_length_counter == 0) return PARSER_EXIT_CODE_EMPTY_TOKEN;
 					(*values)[newline_counter][token_length_counter] = '\0';
 					newline_counter++;
 					token_length_counter = 0;
