@@ -1,11 +1,11 @@
 
 
 #Наисложнейшая сложность сложностей
-difficulty=Extreme Demon
+difficulty = Extreme Demon
 
-rain_chance=77 #топорики
+rain_chance = 77 #топорики
 
-farm_cost=250
+farm_cost = 250
 
-region=Россия
-language=Русский
+region = Россия
+language = Русский

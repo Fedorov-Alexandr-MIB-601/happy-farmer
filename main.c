@@ -214,6 +214,22 @@ void remove_newlines(char* str) {
 	str[edited] = '\0';
 }
 
+//Смешной каламбур
+void remove_back_spaces(char* str) {
+	if (str == NULL)
+		return;
+
+	int i = strlen(str) - 1;
+
+	while (str[i] == ' ') {
+		str[i] = '\0';
+		i--;
+		if (i < 0) {
+			break;
+		}
+	}
+}
+
 
 
 void ask_username() {
@@ -672,6 +688,9 @@ int check_config(const char* config, int* pairs_count) {
 				comment_ignore = FALSE;
 			}
 		}
+		else if (config[i] == ' ' && token_length_counter == 0) {
+			//Пропускаем пробельчики слева
+		}
 		else if (config[i] == '#') {
 			comment_ignore = TRUE;
 			token_length_counter = 0;
@@ -748,12 +767,16 @@ int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_
 					comment_ignore = FALSE;
 				}
 			}
+			else if (content[i] == ' ' && token_length_counter == 0) {
+				//Пропускаем пробельчики слева
+			}
 			else if (content[i] == '#') {
 				comment_ignore = TRUE;
 
 				if (newline_counter + 1 == equals_counter) { //Правая часть
 					if (token_length_counter == 0) return PARSER_EXIT_CODE_EMPTY_TOKEN;
 					(*values)[newline_counter][token_length_counter] = '\0';
+					remove_back_spaces((*values)[newline_counter]);
 					newline_counter++;
 				}
 				token_length_counter = 0;
@@ -763,6 +786,7 @@ int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_
 			else if (content[i] == '=') {
 				if (token_length_counter == 0) return PARSER_EXIT_CODE_EMPTY_TOKEN;
 				(*keys)[newline_counter][token_length_counter] = '\0';
+				remove_back_spaces((*keys)[newline_counter]);
 				equals_counter++;
 				token_length_counter = 0;
 				
@@ -771,6 +795,7 @@ int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_
 				if (equals_counter > newline_counter) {
 					if (token_length_counter == 0) return PARSER_EXIT_CODE_EMPTY_TOKEN;
 					(*values)[newline_counter][token_length_counter] = '\0';
+					remove_back_spaces((*values)[newline_counter]);
 					newline_counter++;
 					token_length_counter = 0;
 					if (newline_counter == _pairs_count) {
