@@ -634,12 +634,14 @@ void menu_settings_parser() {
 		return;
 	}
 
-	FILE* stream = stdout;
-
-	printf("---- Чистая Таблица Настроек: ----\n\n");
+	FILE* fp = fopen("output.txt", "w");
+	fprintf(stdout, "---- Чистая Таблица Настроек: ----\n\n");
+	fprintf(fp, "---- Чистая Таблица Настроек: ----\n\n");
 	for (int i = 0; i < pairs_count; i++)
 	{
-		fprintf(stream, "Параметр: '%s'\t| Значение: '%s'\n", keys[i], values[i]);
+		fprintf(stdout, "Параметр: '%s'\t| Значение: '%s'\n", keys[i], values[i]);
+		fprintf(fp, "Параметр: '%s'\t| Значение: '%s'\n", keys[i], values[i]);
+
 		free(keys[i]);
 	}
 	free(keys);
@@ -648,7 +650,7 @@ void menu_settings_parser() {
 		free(values[i]);
 	}
 	free(values);
-
+	fclose(fp);
 }
 
 
