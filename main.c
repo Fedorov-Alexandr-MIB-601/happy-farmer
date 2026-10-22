@@ -615,7 +615,19 @@ void menu_settings_parser() {
 	int exit_code = parse_config("input.txt", &keys, &values, &pairs_count);
 	if (exit_code == PARSER_EXIT_CODE_EMPTY_TOKEN) {
 		printf("Ошибка: Пустой ключ или значение");
+		return;
 	}
+
+	for (int i = 0; i < pairs_count; i++)
+	{
+		free(keys[i]);
+	}
+	free(keys);
+	for (int i = 0; i < pairs_count; i++)
+	{
+		free(values[i]);
+	}
+	free(values);
 }
 
 
