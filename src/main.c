@@ -165,38 +165,7 @@ void init_variables()
 	}
 }
 
-void remove_newlines(char* str) {
-	if (str == NULL)
-		return;
 
-	int original = 0;
-	int edited = 0;
-
-	while (str[original] != '\0') {
-		if (str[original] != '\n' && str[original] != '\r') {
-			str[edited] = str[original];
-			edited++;
-		}
-		original++;
-	}
-	str[edited] = '\0';
-}
-
-//Смешной каламбур
-void remove_back_spaces(char* str) {
-	if (str == NULL)
-		return;
-
-	int i = strlen(str) - 1;
-
-	while (str[i] == ' ') {
-		str[i] = '\0';
-		i--;
-		if (i < 0) {
-			break;
-		}
-	}
-}
 
 
 
@@ -266,21 +235,7 @@ int loop() {
 
 
 
-void get_string_input_old(const char* message, char* destination_buffer) {
-	if (destination_buffer == NULL) return;
 
-	printf("%s\n>>>", message);
-
-	if (fgets(destination_buffer, MAX_TOKEN_LENGTH, stdin) != NULL) {
-		// Если символ перевода строки НЕ поместился — чистим остаток потока stdin
-		if (strchr(destination_buffer, '\n') == NULL) {
-			int c;
-			while ((c = getchar()) != '\n' && c != EOF);
-		}
-		// Удаляем сам '\n'
-		remove_newlines(destination_buffer);
-	}
-}
 
 
 
