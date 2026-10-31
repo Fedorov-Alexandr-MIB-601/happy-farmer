@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <Windows.h>
 #include <string.h>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 
 #define PARSER_EXIT_CODE_TOKEN_IS_TOO_LONG 1
@@ -73,7 +75,11 @@ void ask_username();
 
 //		----	Функции для помощи при выводе	----
 void clear_screen() {
+#ifdef _WIN32
 	system("cls");
+#else
+	system("clear");
+#endif
 }
 void print_title() {
 	printf("|-------------------------------|\n");
@@ -91,7 +97,7 @@ int get_int_input_range(const char* message, int lowest_value, int highest_value
 void get_string_input(const char* message, char* buffer);
 void get_confirm() {
 	printf("\nОжидание подтверждения...");
-	_getch();
+	getchar();
 }
 
 
@@ -123,8 +129,11 @@ void menu_settings_parser();
 
 int main() 
 {
+#ifdef _WIN32
 	SetConsoleCP(65001);
 	SetConsoleOutputCP(65001); //Тимофей Владиславович сказал, это надо чтобы было без кракозябр в выводе
+#endif
+
 	redraw_to_header();
 	
 	if (setup() != 0) {
@@ -310,6 +319,8 @@ int get_int_input(const char* message)
 			scanf("%*s");
 			continue;
 		}
+		int c;
+		while ((c = getchar()) != '\n' && c != EOF);
 		return raw_input;
 	}
 	return -1;
@@ -333,6 +344,8 @@ int get_int_input_range(const char* message, int lowest_value, int highest_value
 			printf("Число дожно быть в диапазоне от %d до %d включительно!\n", lowest_value, highest_value);
 			continue;
 		}
+		int c;
+		while ((c = getchar()) != '\n' && c != EOF);
 		return raw_input;
 	}
 	return -1;
