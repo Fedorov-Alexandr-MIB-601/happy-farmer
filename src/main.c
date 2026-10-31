@@ -109,7 +109,7 @@ void show_time() {
 
 
 //		----	Функции для работы с файлами	----
-int parse_config(const char* filepath, char** keys, char** values, int* pairs_count);
+int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_count);
 
 //		----	Геймплейные функции				----
 void feed_forward_time(int hours_to_skip);
