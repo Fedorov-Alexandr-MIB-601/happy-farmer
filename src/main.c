@@ -3,41 +3,14 @@
 #include <string.h>
 
 
+#include "constants.h"
 #include "utils.h"
 
 #ifdef _WIN32
 #include <Windows.h>
 #endif
 
-#define NULL 0
-#define FALSE 0
-#define TRUE 1
 
-
-#define PARSER_EXIT_CODE_TOKEN_IS_TOO_LONG 1
-#define PARSER_EXIT_CODE_WRONG_FORMAT 2
-#define PARSER_EXIT_CODE_FAILED_OPEN_FILE 3
-#define PARSER_EXIT_CODE_EMPTY_TOKEN 4
-
-
-// Пункты выбора в меню
-#define SELECTION_EXIT 0
-#define SELECTION_CHECK_TIME 1
-#define SELECTION_WORK 2
-#define SELECTION_CHECK_INVENTORY 3
-#define SELECTION_SET_ITEM 4
-#define SELECTION_DROP_ITEM 5
-#define SELECTION_INVENTORY_REVISION 6
-#define SELECTION_INVENTORY_SEARCH 7
-#define SELECTION_MAKE_SNAPSHOT 8
-#define SELECTION_SETTINGS_PARSER 9
-
-
-
-
-
-#define MAX_ITEMS_COUNT 10
-#define MAX_TOKEN_LENGTH 64
 
 char username[MAX_TOKEN_LENGTH];
 
@@ -79,41 +52,17 @@ int loop(); //Вернуть 0, если хочешь оборвать вечн�
 void init_variables();
 void ask_username();
 
-
-//		----	Функции для помощи при выводе	----
-void clear_screen() {
-#ifdef _WIN32
-	system("cls");
-#else
-	system("clear");
-#endif
-}
-void print_title() {
-	printf("|-------------------------------|\n");
-	printf("| H A P P Y   F A R M E R v0.02 |\n");
-	printf("|-------------------------------|\n");
-	printf("\n");
-}
-void redraw_to_header() {
-	clear_screen();
-	print_title();
-}
-void print_action_selection();
-int get_int_input(const char* message);
-int get_int_input_range(const char* message, int lowest_value, int highest_value);
-void get_string_input(const char* message, char* buffer);
-void get_confirm() {
-	printf("\nОжидание подтверждения...");
-	getchar();
-}
-
-
-char* get_military_time(int hour);
-void print_id_to_item();
+//		----	Вывод	----
 void show_time() {
 	printf("День %d, %s", current_day, get_military_time(current_hour));
 }
+void print_id_to_item() {
+	for (int i = 1; i < MAX_ITEMS_COUNT; i++)
+	{
+		printf("[%d] - %s\n", i, item_id_to_name[i]);
+	}
 
+}
 
 //		----	Функции для работы с файлами	----
 int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_count);
@@ -197,11 +146,6 @@ int setup() {
 	init_variables();
 
 	redraw_to_header();
-
-	if (test_function() == 1) {
-		printf("utils.h успешно подключён!\n");
-	}
-
 	ask_username();
 
 	get_confirm();
@@ -270,7 +214,7 @@ void ask_username() {
 
 int loop() {
 	redraw_to_header();
-	print_action_selection();
+	print_action_selection(username);
 	int user_selection = get_int_input_range("", 0, 9);
 	redraw_to_header();
 
@@ -321,50 +265,6 @@ int loop() {
 
 
 
-int get_int_input(const char* message)
-{
-	while (1)
-	{
-		printf(message);
-		printf("\n>>>");
-		int raw_input;
-		if (scanf("%d", &raw_input) != 1)
-		{
-			printf("Кажется, это не число...\n");
-			scanf("%*s");
-			continue;
-		}
-		int c;
-		while ((c = getchar()) != '\n' && c != EOF);
-		return raw_input;
-	}
-	return -1;
-}
-
-int get_int_input_range(const char* message, int lowest_value, int highest_value)
-{
-	while(1)
-	{
-		printf(message);
-		printf("\n>>>");
-		int raw_input;
-		if (scanf("%d", &raw_input) != 1)
-		{
-			printf("Кажется, это не число...\n");
-			scanf("%*s");
-			continue;
-		}
-
-		if (raw_input < lowest_value || raw_input > highest_value) {
-			printf("Число дожно быть в диапазоне от %d до %d включительно!\n", lowest_value, highest_value);
-			continue;
-		}
-		int c;
-		while ((c = getchar()) != '\n' && c != EOF);
-		return raw_input;
-	}
-	return -1;
-}
 
 void get_string_input_old(const char* message, char* destination_buffer) {
 	if (destination_buffer == NULL) return;
@@ -382,77 +282,12 @@ void get_string_input_old(const char* message, char* destination_buffer) {
 	}
 }
 
-void get_string_input(const char* message, char* destination_buffer) {
-	if (destination_buffer == NULL) return;
-
-	printf("%s\n>>> ", message);
-	//Опять что-ли себе на комп линукс поставить???
-#ifdef _WIN32
-	// На Windows читаем в UTF-16, чтобы консоль не ломала кириллицу
-	HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
-	wchar_t wbuffer[512];
-	DWORD charsRead = 0;
-
-	// Читаем из консоли Windows
-	if (ReadConsoleW(hStdin, wbuffer, sizeof(wbuffer) / sizeof(wchar_t) - 1, &charsRead, NULL)) {
-		wbuffer[charsRead] = L'\0';
-
-		// Конвертируем прочитанную широкую строку (UTF-16) в UTF-8
-		WideCharToMultiByte(CP_UTF8, 0, wbuffer, -1, destination_buffer, MAX_TOKEN_LENGTH, NULL, NULL);
-	}
-	else {
-		// Запасной вариант (если ввод был перенаправлен из файла, а не из реальной консоли)
-		if (fgets(destination_buffer, MAX_TOKEN_LENGTH, stdin) == NULL) {
-			destination_buffer[0] = '\0';
-		}
-	}
-#else
-	// На Linux / macOS fgets работает с UTF-8 идеально
-	if (fgets(destination_buffer, MAX_TOKEN_LENGTH, stdin) == NULL) {
-		destination_buffer[0] = '\0';
-	}
-#endif
-
-	// Убираем \r и \n на конце
-	remove_newlines(destination_buffer);
-}
 
 
-void print_action_selection()
-{
-	
-	printf("Что ты выберешь, %s?\n", username);
-	printf("[0] - Выход\n");
-	printf("[1] - Посмотреть на часы\n");
-	printf("[2] - Поработать\n");
-	printf("[3] - Посмотреть инвентарь\n");
-	printf("[4] - Положить предмет в слот\n");
-	printf("[5] - Выбросить предмет\n");
-	printf("[6] - Ревизия ресурсов\n");
-	printf("[7] - Поиск предмета в рюкзаке по названию\n");
-	printf("[8] - Записать состояние в дневник фермера\n");
-	printf("[9] - Парсер файла настроек\n");
-	
-}
 
-char* get_military_time(int hour) {
-	hour %= 24;
-	static char result[6] = "";
-	
-	if (hour < 10) {
-		strcat(result, "0");
-	}
-	snprintf(result, sizeof(result), "%02d:00", hour);
-	return result;
 
-}
-void print_id_to_item() {
-	for (int i = 1; i < MAX_ITEMS_COUNT; i++)
-	{
-		printf("[%d] - %s\n", i, item_id_to_name[i]);
-	}
 
-}
+
 
 const int HOURS_IN_DAY = 24;
 void feed_forward_time(int hours_to_skip) {
