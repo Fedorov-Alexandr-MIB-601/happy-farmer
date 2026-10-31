@@ -6,8 +6,10 @@
 #include <Windows.h>
 #endif
 
+#define NULL 0
 #define FALSE 0
 #define TRUE 1
+
 
 #define PARSER_EXIT_CODE_TOKEN_IS_TOO_LONG 1
 #define PARSER_EXIT_CODE_WRONG_FORMAT 2
@@ -395,7 +397,7 @@ void get_string_input(const char* message, char* destination_buffer) {
 	}
 #else
 	// На Linux / macOS fgets работает с UTF-8 идеально
-	if (fgets(destination_buffer, (int)max_size, stdin) == NULL) {
+	if (fgets(destination_buffer, MAX_TOKEN_LENGTH, stdin) == NULL) {
 		destination_buffer[0] = '\0';
 	}
 #endif
