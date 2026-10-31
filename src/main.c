@@ -150,8 +150,7 @@ int setup() {
 }
 
 
-const int START_DAY = 1;
-const int START_HOUR = 8;
+
 void init_variables()
 {
 	current_day = START_DAY;
@@ -241,7 +240,7 @@ int loop() {
 
 
 
-const int HOURS_IN_DAY = 24;
+
 void feed_forward_time(int hours_to_skip) {
 	current_hour += hours_to_skip;
 	int days_passed = current_hour / HOURS_IN_DAY;

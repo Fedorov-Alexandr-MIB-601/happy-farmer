@@ -30,3 +30,8 @@
 #define INVENTORY_SIZE 10
 #define MAX_ITEMS_COUNT 10
 #define MAX_TOKEN_LENGTH 64
+
+
+#define HOURS_IN_DAY 24
+#define START_DAY 1
+#define START_HOUR 8
