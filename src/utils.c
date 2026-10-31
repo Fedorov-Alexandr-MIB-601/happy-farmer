@@ -20,7 +20,7 @@ void clear_screen() {
 
 void print_title() {
 	printf("|-------------------------------|\n");
-	printf("| H A P P Y   F A R M E R v0.02 |\n");
+	printf("| H A P P Y   F A R M E R v0.03 |\n");
 	printf("|-------------------------------|\n\n");
 }
 
