@@ -1,10 +1,12 @@
 #include "utils.h"
 
+#include "constants.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "constants.h"
+
 
 #ifdef _WIN32
 #include <Windows.h>

@@ -1,10 +1,9 @@
 #pragma once
 
-#define NULL 0
 #define FALSE 0
 #define TRUE 1
 
-
+// Ошибки парсера
 #define PARSER_EXIT_CODE_TOKEN_IS_TOO_LONG 1
 #define PARSER_EXIT_CODE_WRONG_FORMAT 2
 #define PARSER_EXIT_CODE_FAILED_OPEN_FILE 3
@@ -26,6 +25,6 @@
 
 
 
-
+#define INVENTORY_SIZE 10
 #define MAX_ITEMS_COUNT 10
 #define MAX_TOKEN_LENGTH 64
