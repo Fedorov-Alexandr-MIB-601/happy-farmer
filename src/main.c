@@ -641,7 +641,7 @@ void menu_settings_parser() {
 	char** keys;
 	char** values;
 	int pairs_count;
-	int exit_code = parse_config("input.txt", &keys, &values, &pairs_count);
+	int exit_code = parse_config("assets/input.txt", &keys, &values, &pairs_count);
 	if (exit_code == PARSER_EXIT_CODE_EMPTY_TOKEN) {
 		printf("Ошибка: Пустой ключ или значение");
 		return;
