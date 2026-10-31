@@ -145,3 +145,37 @@ char* get_military_time(int hour) {
 	return result;
 
 }
+
+
+void remove_newlines(char* str) {
+	if (str == NULL)
+		return;
+
+	int original = 0;
+	int edited = 0;
+
+	while (str[original] != '\0') {
+		if (str[original] != '\n' && str[original] != '\r') {
+			str[edited] = str[original];
+			edited++;
+		}
+		original++;
+	}
+	str[edited] = '\0';
+}
+
+//Смешной каламбур
+void remove_back_spaces(char* str) {
+	if (str == NULL)
+		return;
+
+	int i = strlen(str) - 1;
+
+	while (str[i] == ' ') {
+		str[i] = '\0';
+		i--;
+		if (i < 0) {
+			break;
+		}
+	}
+}
