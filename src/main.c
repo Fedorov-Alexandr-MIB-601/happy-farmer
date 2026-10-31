@@ -6,6 +6,8 @@
 #include <Windows.h>
 #endif
 
+#define FALSE 0
+#define TRUE 1
 
 #define PARSER_EXIT_CODE_TOKEN_IS_TOO_LONG 1
 #define PARSER_EXIT_CODE_WRONG_FORMAT 2
