@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+#include "utils.h"
+
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -140,6 +143,9 @@ int main()
 
 	redraw_to_header();
 	
+	
+
+
 	if (setup() != 0) {
 		return 1;
 	}
@@ -191,6 +197,11 @@ int setup() {
 	init_variables();
 
 	redraw_to_header();
+
+	if (test_function() == 1) {
+		printf("utils.h успешно подключён!\n");
+	}
+
 	ask_username();
 
 	get_confirm();

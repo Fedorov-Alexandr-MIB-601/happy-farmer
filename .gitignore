@@ -1,7 +1,12 @@
 #очень важные файлы Visual Studio, без которых совсем никуда, вот они даже в отдельном списке, чтобы не потерялись:
+/.vs/
 /happy-farmer/
 /x64/
 happy-farmer.sln
 happy-farmer.vcxproj
 happy-farmer.vcxproj.filters
 happy-farmer.vcxproj.user
+
+#выходы от весёлого фермера:
+diary.txt
+output.txt
