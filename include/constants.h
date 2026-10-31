@@ -1,9 +1,7 @@
 #pragma once
 
-#ifndef NULL
-#define NULL 0
-#endif //NULL
 
+#define NULL 0
 #define FALSE 0
 #define TRUE 1
 

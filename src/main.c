@@ -260,7 +260,7 @@ int set_item(int slot_index, int item_id) {
 }
 
 int clear_item(int slot_index) {
-	return set_item(slot_index, NULL);
+	return set_item(slot_index, 0);
 }
 
 int count_items(int item_id) {
