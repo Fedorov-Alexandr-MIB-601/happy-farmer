@@ -26,3 +26,5 @@ void print_world(struct World* world);
 //Пытается сдвинуть игрока, учитывая коллизию. Изменяет world
 int try_move_player(struct World* world, int direction_x, int direction_y);
 
+int is_cell_blocked(struct World* world, int x, int y);
+

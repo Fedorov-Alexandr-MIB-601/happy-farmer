@@ -461,6 +461,25 @@ void menu_selection() {
 			break;
 		}
 
+		switch (last_input) {
+		case 'w':
+			try_move_player(world, 0, -1);
+			break;
+		case 'a':
+			try_move_player(world, -1, 0);
+			break;
+		case 's':
+			try_move_player(world, 0, 1);
+			break;
+		case 'd':
+			try_move_player(world, 1, 0);
+			break;
+
+		}
+		
+
+		
+
 	}
 
 	free_world(world);
