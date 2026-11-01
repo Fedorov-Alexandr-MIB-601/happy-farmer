@@ -104,6 +104,11 @@ int is_cell_blocked(struct World* world, int x, int y) {
 	return FALSE;
 }
 
+int is_cell_empty(struct World* world, int x, int y) {
+	if (*get_cell(world, x, y) == '.') return TRUE;
+	return FALSE;
+}
+
 int try_move_player(struct World* world, int direction_x, int direction_y) {
 	int pos_x = world->player_position_x;
 	int pos_y = world->player_position_y;
@@ -128,7 +133,7 @@ void get_random_empty_cell(struct World* world, int* out_x, int* out_y) {
 	while (TRUE) {
 		int test_x = rand() % world->map_width;
 		int test_y = rand() % world->map_height;
-		if (!is_cell_blocked(world, test_x, test_y)) {
+		if (is_cell_empty(world, test_x, test_y)) {
 			*out_x = test_x;
 			*out_y = test_y;
 			return;
