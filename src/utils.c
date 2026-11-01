@@ -182,3 +182,12 @@ void remove_back_spaces(char* str) {
 		}
 	}
 }
+
+
+int rand_top(int max) {
+	return rand() % max;
+}
+
+int rand_range(int min, int max) {
+	return (rand_top(max - min)) + min;
+}

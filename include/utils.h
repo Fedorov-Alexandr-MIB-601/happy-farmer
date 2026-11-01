@@ -14,3 +14,6 @@ char* get_military_time(int hour);
 
 void remove_newlines(char* str);
 void remove_back_spaces(char* str);
+
+int rand_top(int max);
+int rand_range(int min, int max);

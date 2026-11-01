@@ -3,11 +3,12 @@
 #include "constants.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "utils.h"
 
 char** generate_map(int* out_height, int* out_width) {
 	char** map;
-	int height = (rand() % (MAP_MAX_SIZE - MAP_MIN_SIZE)) + MAP_MIN_SIZE;
-	int width = (rand() % (MAP_MAX_SIZE - MAP_MIN_SIZE)) + MAP_MIN_SIZE;
+	int height = rand_range(MAP_MIN_SIZE, MAP_MAX_SIZE);
+	int width = rand_range(MAP_MIN_SIZE, MAP_MAX_SIZE);
 
 	// 1. Выделяем память под массив указателей (строк)
 	map = (char**)malloc(height * sizeof(char*));
