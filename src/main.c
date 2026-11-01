@@ -434,9 +434,8 @@ void menu_selection() {
 	int frame_counter = 0;
 	char last_input = 0;
 
-	int map_height = 0;
-	int map_width = 0;
-	char** map = generate_map(&map_height, &map_width);
+	struct World* world = get_world();
+
 	while (TRUE) {
 		
 
@@ -444,12 +443,7 @@ void menu_selection() {
 		redraw_to_header();
 		printf("  <>---- Подземелье ----<>\n\n");
 		
-		for (int y = 0; y < map_height; y++) {
-			for (int x = 0; x < map_width; x++) {
-				putc(map[y][x], stdout);
-			}
-			printf("\n");
-		}
+		print_world(world);
 
 		printf("\nframe %d\n", frame_counter);
 		printf("\nlast-input %c\n", last_input);
@@ -469,7 +463,7 @@ void menu_selection() {
 
 	}
 
-	free_map(map, map_height, map_width);
+	free_world(world);
 
 }
 
