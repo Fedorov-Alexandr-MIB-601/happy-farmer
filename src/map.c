@@ -54,11 +54,32 @@ void print_map(char** map, int height, int width, int player_position_x, int pla
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
 			if (x == player_position_x && y == player_position_y)
-				putc('@', stdout);
-			else
-				putc(map[y][x], stdout);
+				printf("\033[33m@");
+				//putc('@', stdout);
+			else {
+				switch (map[y][x]) {
+				case 'R':
+					printf("\033[36m%c", map[y][x]);
+					break;
+				case 'T':
+					printf("\033[32m%c", map[y][x]);
+					break;
+				case 'U':
+					printf("\033[31m%c", map[y][x]);
+					break;
+				case 'D':
+					printf("\033[31m%c", map[y][x]);
+					break;
+				default:
+					printf("\033[0m%c", map[y][x]);
+					break;
+				}
+				
+			}
+				
+				
 		}
-		printf("\n");
+		printf("\033[0m\n");
 	}
 }
 
