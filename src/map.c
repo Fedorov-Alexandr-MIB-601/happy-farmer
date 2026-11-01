@@ -108,7 +108,7 @@ struct World* get_world(unsigned char generate_up_ladder) {
 	get_random_empty_cell(world, &(world->player_position_x), &(world->player_position_y));
 
 
-	world->creaky_floor = (char**)malloc(world->map_height * sizeof(char*));
+	world->creaky_floor = (unsigned char**)malloc(world->map_height * sizeof(char*));
 	for (int i = 0; i < world->map_height; i++) {
 		world->creaky_floor[i] = (char*)malloc((world->map_width) * sizeof(char));
 	}
