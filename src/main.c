@@ -462,6 +462,8 @@ void menu_selection() {
 		}
 
 		if (last_input == 'q') {
+			int c;
+			while ((c = getchar()) != '\n' && c != EOF); //чистим чистим чистим
 			break;
 		}
 
