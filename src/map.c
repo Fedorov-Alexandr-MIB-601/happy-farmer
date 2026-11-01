@@ -141,7 +141,10 @@ struct World* get_world(unsigned char generate_up_ladder) {
 
 void free_world(struct World* world) {
 	free_map(world->map, world->map_height, world->map_width);
-	free_map(world->creaky_floor, world->map_height, world->map_width);
+	for (int y = 0; y < world->map_height; y++) {
+		free(world->creaky_floor[y]);
+	}
+	free(world->creaky_floor);
 	free(world);
 }
 
