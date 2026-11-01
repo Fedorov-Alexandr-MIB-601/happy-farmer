@@ -10,3 +10,6 @@ happy-farmer.vcxproj.user
 #выходы от весёлого фермера:
 diary.txt
 output.txt
+
+
+remote-linux.bat
