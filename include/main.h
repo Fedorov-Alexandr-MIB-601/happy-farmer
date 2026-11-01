@@ -29,3 +29,4 @@ void menu_inventory_revision();
 void menu_inventory_search();
 void menu_make_snapshot();
 void menu_settings_parser();
+void menu_selection();

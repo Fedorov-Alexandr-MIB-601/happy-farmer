@@ -8,6 +8,7 @@
 #include "constants.h"
 #include "utils.h"
 #include "parser.h"
+#include "map.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -148,7 +149,7 @@ void ask_username() {
 int loop() {
 	redraw_to_header();
 	print_action_selection(username);
-	int user_selection = get_int_input_range("", 0, 9);
+	int user_selection = get_int_input_range("", 0, 10);
 	redraw_to_header();
 
 	switch (user_selection)
@@ -187,6 +188,9 @@ int loop() {
 		break;
 	case SELECTION_SETTINGS_PARSER:
 		menu_settings_parser();
+		break;
+	case SELECTION_ADVENTURE:
+		menu_selection();
 		break;
 	default:
 		printf("Такого действия нет!\n");
@@ -424,4 +428,46 @@ void menu_settings_parser() {
 	fclose(fp);
 }
 
+
+
+void menu_selection() {
+	int frame_counter = 0;
+	char last_input = 0;
+
+	int map_height = 0;
+	int map_width = 0;
+	char** map = generate_map(&map_height, &map_width);
+	while (TRUE) {
+		
+
+
+		redraw_to_header();
+		printf("  <>---- Подземелье ----<>\n\n");
+		
+		for (int y = 0; y < map_height; y++) {
+			for (int x = 0; x < map_width; x++) {
+				putc(map[y][x], stdout);
+			}
+			printf("\n");
+		}
+
+		printf("\nframe %d\n", frame_counter);
+		printf("\nlast-input %c\n", last_input);
+
+		frame_counter++;
+		
+		last_input = getchar();
+		while (last_input == '\n') {
+			last_input = getchar();
+		}
+
+		if (last_input == 'q') {
+			break;
+		}
+
+	}
+
+	free_map(map, map_height, map_width);
+
+}
 
