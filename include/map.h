@@ -24,10 +24,10 @@ void free_world(struct World* world);
 void print_world(struct World* world);
 
 //Пытается сдвинуть игрока, учитывая коллизию. Изменяет world
-int try_move_player(struct World* world, int direction_x, int direction_y);
+unsigned char try_move_player(struct World* world, int direction_x, int direction_y);
 
-int is_cell_blocked(struct World* world, int x, int y);
-int is_cell_empty(struct World* world, int x, int y);
+unsigned char is_cell_blocked(struct World* world, int x, int y);
+unsigned char is_cell_empty(struct World* world, int x, int y);
 
 void get_random_empty_cell(struct World* world, int* out_x, int* out_y);
 

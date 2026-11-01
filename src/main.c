@@ -433,58 +433,72 @@ void menu_settings_parser() {
 void menu_selection() {
 	int frame_counter = 0;
 	char last_input = 0;
+	int depth = 1;
 
-	struct World* world = get_world();
 
 	while (TRUE) {
-		
+		unsigned char exit = FALSE;
+
+		struct World* world = get_world();
+
+		while (TRUE) {
 
 
-		redraw_to_header();
-		printf("  <>---- Подземелье ----<>\n\n");
-		
-		print_world(world);
 
-		printf("\nframe %d\n", frame_counter);
-		printf("\nlast-input %c\n", last_input);
+			redraw_to_header();
+			printf("  <>---- Подземелье ----<>   Глубина: %d\n\n", depth);
 
-		frame_counter++;
-		
-		last_input = getchar();
-		while (last_input == '\n') {
+			print_world(world);
+
+			printf("\nframe %d\n", frame_counter);
+			printf("\nlast-input %c\n", last_input);
+
+			frame_counter++;
+
 			last_input = getchar();
-		}
+			while (last_input == '\n') {
+				last_input = getchar();
+			}
 
-		if (last_input == 'q' && *get_cell_player_standing(world) == 'U') {
+			if (last_input == 'q' && *get_cell_player_standing(world) == 'U') {
+
+
+				int c;
+				while ((c = getchar()) != '\n' && c != EOF); //чистим чистим чистим
+				
+				exit = TRUE;
+				break;
+			}
+
+			switch (last_input) {
+			case 'w':
+				try_move_player(world, 0, -1);
+				break;
+			case 'a':
+				try_move_player(world, -1, 0);
+				break;
+			case 's':
+				try_move_player(world, 0, 1);
+				break;
+			case 'd':
+				try_move_player(world, 1, 0);
+				break;
+
+			}
+
+			if (*get_cell_player_standing(world) == 'D') {
+				depth++;
+				break;
+			}
 			
 
-			int c;
-			while ((c = getchar()) != '\n' && c != EOF); //чистим чистим чистим
-			break;
 		}
 
-		switch (last_input) {
-		case 'w':
-			try_move_player(world, 0, -1);
+		free_world(world);
+		if (exit) {
 			break;
-		case 'a':
-			try_move_player(world, -1, 0);
-			break;
-		case 's':
-			try_move_player(world, 0, 1);
-			break;
-		case 'd':
-			try_move_player(world, 1, 0);
-			break;
-
 		}
-		
-
-		
-
 	}
-
-	free_world(world);
 
 }
 

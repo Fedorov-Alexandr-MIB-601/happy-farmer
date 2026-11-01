@@ -97,19 +97,19 @@ void print_world(struct World* world) {
 	print_map(world->map, world->map_height, world->map_width, world->player_position_x, world->player_position_y);
 }
 
-int is_cell_blocked(struct World* world, int x, int y) {
+unsigned char is_cell_blocked(struct World* world, int x, int y) {
 	if (*get_cell(world, x, y) == '#') return TRUE;
 	if (*get_cell(world, x, y) == 'R') return TRUE;
 	if (*get_cell(world, x, y) == 'T') return TRUE;
 	return FALSE;
 }
 
-int is_cell_empty(struct World* world, int x, int y) {
+unsigned char is_cell_empty(struct World* world, int x, int y) {
 	if (*get_cell(world, x, y) == '.') return TRUE;
 	return FALSE;
 }
 
-int try_move_player(struct World* world, int direction_x, int direction_y) {
+unsigned char try_move_player(struct World* world, int direction_x, int direction_y) {
 	int pos_x = world->player_position_x;
 	int pos_y = world->player_position_y;
 
