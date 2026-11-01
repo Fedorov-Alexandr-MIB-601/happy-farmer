@@ -30,10 +30,13 @@ unsigned char is_cell_blocked(struct World* world, int x, int y);
 unsigned char is_cell_empty(struct World* world, int x, int y);
 
 void get_random_empty_cell(struct World* world, int* out_x, int* out_y);
+void get_random_empty_cell_radius_square(struct World* world, int* out_x, int* out_y, int center_x, int center_y, int radius);
 
 void set_cell(struct World* world, int x, int y, char cell);
 
+void get_first_empty_cell(struct World* world, int* out_x, int* out_y);
 void set_cell_to_random_free_pos(struct World* world, char cell);
+void set_cell_to_random_free_pos_radius_square(struct World* world, char cell, int center_x, int center_y, int radius);
 
 char* get_cell(struct World* world, int x, int y);
 char* get_cell_player_standing(struct World* world);

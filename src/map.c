@@ -75,16 +75,25 @@ void set_cell_to_random_free_pos(struct World* world, char cell) {
 	set_cell(world, pos_x, pos_y, cell);
 }
 
+void set_cell_to_random_free_pos_radius_square(struct World* world, char cell, int center_x, int center_y, int radius) {
+	int pos_x;
+	int pos_y;
+	get_random_empty_cell_radius_square(world, &pos_x, &pos_y, center_x, center_y, radius);
+	set_cell(world, pos_x, pos_y, cell);
+}
+
 struct World* get_world() {
 	struct World* world = malloc(sizeof(struct World));
 	
 	world->map = generate_map(&(world->map_height), &(world->map_width));
+	get_random_empty_cell(world, &(world->player_position_x), &(world->player_position_y));
+
 
 	set_cell_to_random_free_pos(world, 'D');
-	set_cell_to_random_free_pos(world, 'U');
+	set_cell_to_random_free_pos_radius_square(world, 'U', world->player_position_x, world->player_position_y, 1);
 
 
-	get_random_empty_cell(world, &(world->player_position_x), &(world->player_position_y));
+	
 
 	return world;
 }
@@ -106,7 +115,9 @@ unsigned char is_cell_blocked(struct World* world, int x, int y) {
 }
 
 unsigned char is_cell_empty(struct World* world, int x, int y) {
-	if (*get_cell(world, x, y) == '.') return TRUE;
+	char* cell = get_cell(world, x, y);
+	if (cell != NULL)
+		if (*cell == '.') return TRUE;
 	return FALSE;
 }
 
@@ -130,17 +141,7 @@ unsigned char try_move_player(struct World* world, int direction_x, int directio
 
 }
 
-void get_random_empty_cell(struct World* world, int* out_x, int* out_y) {
-	for (int atmpt = 0; atmpt < 100; atmpt++) {
-		int test_x = rand() % world->map_width;
-		int test_y = rand() % world->map_height;
-		if (is_cell_empty(world, test_x, test_y)) {
-			*out_x = test_x;
-			*out_y = test_y;
-			return;
-		}
-	}
-
+void get_first_empty_cell(struct World* world, int* out_x, int* out_y) {
 	for (int y = 0; y < world->map_height; y++)
 	{
 		for (int x = 0; x < world->map_width; x++)
@@ -155,6 +156,36 @@ void get_random_empty_cell(struct World* world, int* out_x, int* out_y) {
 
 	*out_x = -1;
 	*out_y = -1;
+}
+
+void get_random_empty_cell(struct World* world, int* out_x, int* out_y) {
+	for (int atmpt = 0; atmpt < 100; atmpt++) {
+		int test_x = rand() % world->map_width;
+		int test_y = rand() % world->map_height;
+		if (is_cell_empty(world, test_x, test_y)) {
+			*out_x = test_x;
+			*out_y = test_y;
+			return;
+		}
+	}
+
+	get_first_empty_cell(world, out_x, out_y);
+}
+
+
+
+void get_random_empty_cell_radius_square(struct World* world, int* out_x, int* out_y, int center_x, int center_y, int radius) {
+	for (int atmpt = 0; atmpt < 100; atmpt++) {
+		int test_x = rand_range(center_x - radius, center_x + radius + 1);
+		int test_y = rand_range(center_y - radius, center_y + radius + 1);
+		if (is_cell_empty(world, test_x, test_y)) {
+			*out_x = test_x;
+			*out_y = test_y;
+			return;
+		}
+	}
+
+	get_first_empty_cell(world, out_x, out_y);
 }
 
 char* get_cell(struct World* world, int x, int y) {

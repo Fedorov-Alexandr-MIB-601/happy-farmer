@@ -190,7 +190,7 @@ int loop() {
 		menu_settings_parser();
 		break;
 	case SELECTION_ADVENTURE:
-		menu_selection();
+		menu_adventure();
 		break;
 	default:
 		printf("Такого действия нет!\n");
@@ -430,7 +430,7 @@ void menu_settings_parser() {
 
 
 
-void menu_selection() {
+void menu_adventure() {
 	int frame_counter = 0;
 	char last_input = 0;
 	int depth = 1;
@@ -450,8 +450,14 @@ void menu_selection() {
 
 			print_world(world);
 
-			printf("\nframe %d\n", frame_counter);
-			printf("\nlast-input %c\n", last_input);
+			//printf("\nframe %d\n", frame_counter);
+			//printf("\nlast-input %c\n", last_input);
+
+			printf("\n[w] - Вверх   [s] - Вниз   [a] - Влево   [d] - Вправо   ");
+			if (*get_cell_player_standing(world) == 'U') {
+				printf("[q] - Выход");
+			}
+			printf("\n>>>");
 
 			frame_counter++;
 
