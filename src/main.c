@@ -455,7 +455,9 @@ void menu_selection() {
 			last_input = getchar();
 		}
 
-		if (last_input == 'q') {
+		if (last_input == 'q' && *get_cell_player_standing(world) == 'U') {
+			
+
 			int c;
 			while ((c = getchar()) != '\n' && c != EOF); //чистим чистим чистим
 			break;

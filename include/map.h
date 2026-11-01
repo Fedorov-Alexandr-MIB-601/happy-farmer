@@ -28,3 +28,11 @@ int try_move_player(struct World* world, int direction_x, int direction_y);
 
 int is_cell_blocked(struct World* world, int x, int y);
 
+void get_random_empty_cell(struct World* world, int* out_x, int* out_y);
+
+void set_cell(struct World* world, int x, int y, char cell);
+
+void set_cell_to_random_free_pos(struct World* world, char cell);
+
+char* get_cell(struct World* world, int x, int y);
+char* get_cell_player_standing(struct World* world);
