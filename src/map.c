@@ -85,8 +85,6 @@ void print_map(char** map, int height, int width, int player_position_x, int pla
 
 void set_cell(struct World* world, int x, int y, char cell) {
 	*get_cell(world, x, y) = cell;
-
-	
 }
 
 void set_cell_to_random_free_pos(struct World* world, char cell) {
@@ -103,15 +101,37 @@ void set_cell_to_random_free_pos_radius_square(struct World* world, char cell, i
 	set_cell(world, pos_x, pos_y, cell);
 }
 
-struct World* get_world() {
+struct World* get_world(unsigned char generate_up_ladder) {
 	struct World* world = malloc(sizeof(struct World));
 	
 	world->map = generate_map(&(world->map_height), &(world->map_width));
 	get_random_empty_cell(world, &(world->player_position_x), &(world->player_position_y));
 
 
+	world->creaky_floor = (char**)malloc(world->map_height * sizeof(char*));
+	for (int i = 0; i < world->map_height; i++) {
+		world->creaky_floor[i] = (char*)malloc((world->map_width) * sizeof(char));
+	}
+
+	for (int y = 0; y < world->map_height; y++)
+	{
+		for (int x = 0; x < world->map_width; x++)
+		{
+			if (rand_top(100) < 10) {
+				world->creaky_floor[y][x] = TRUE;
+			}
+			else {
+				world->creaky_floor[y][x] = FALSE;
+			}
+		}
+	}
+
+
 	set_cell_to_random_free_pos(world, 'D');
-	set_cell_to_random_free_pos_radius_square(world, 'U', world->player_position_x, world->player_position_y, 1);
+
+	if (generate_up_ladder)
+		set_cell_to_random_free_pos_radius_square(world, 'U', world->player_position_x, world->player_position_y, 1);
+
 
 
 	
@@ -121,6 +141,7 @@ struct World* get_world() {
 
 void free_world(struct World* world) {
 	free_map(world->map, world->map_height, world->map_width);
+	free_map(world->creaky_floor, world->map_height, world->map_width);
 	free(world);
 }
 
@@ -219,4 +240,8 @@ char* get_cell(struct World* world, int x, int y) {
 
 char* get_cell_player_standing(struct World* world) {
 	return get_cell(world, world->player_position_x, world->player_position_y);
+}
+
+unsigned char is_cell_creaky(struct World* world, int x, int y) {
+	return world->creaky_floor[y][x];
 }

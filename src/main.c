@@ -435,11 +435,15 @@ void menu_adventure() {
 	char last_input = 0;
 	int depth = 1;
 
+	unsigned char generate_up_ladder = TRUE;
 
 	while (TRUE) {
 		unsigned char exit = FALSE;
 
-		struct World* world = get_world();
+		
+		struct World* world = get_world(generate_up_ladder);
+		if (generate_up_ladder == FALSE)
+			generate_up_ladder = TRUE;
 
 		while (TRUE) {
 
@@ -453,8 +457,28 @@ void menu_adventure() {
 			//printf("\nframe %d\n", frame_counter);
 			//printf("\nlast-input %c\n", last_input);
 
+			char player_cell = *get_cell_player_standing(world);
+
+			if (player_cell == ',') {
+				if (rand_top(100) < 50) {
+					printf("\n\033[31mПол скрипит!\033[0m\n");
+				}
+				else {
+					generate_up_ladder = FALSE;
+					depth++;
+					break;
+				}
+			}
+			else if (player_cell == '.') {
+				if (is_cell_creaky(world, world->player_position_x, world->player_position_y)) {
+					printf("\n\033[31mОсторожно, скрипучий пол!\033[0m\n");
+					*get_cell(world, world->player_position_x, world->player_position_y) = ',';
+				}
+			}
+
+
 			printf("\n[w] - Вверх   [s] - Вниз   [a] - Влево   [d] - Вправо   ");
-			if (*get_cell_player_standing(world) == 'U') {
+			if (player_cell == 'U') {
 				printf("[q] - Выход");
 			}
 			printf("\n>>>");

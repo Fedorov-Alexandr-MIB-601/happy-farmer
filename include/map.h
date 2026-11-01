@@ -6,6 +6,7 @@ struct World
 	int player_position_x, player_position_y;
 	int map_height, map_width;
 	char** map;
+	unsigned char** creaky_floor;
 };
 
 //Генерирует случайную карту и возвращает указатель на неё
@@ -40,3 +41,5 @@ void set_cell_to_random_free_pos_radius_square(struct World* world, char cell, i
 
 char* get_cell(struct World* world, int x, int y);
 char* get_cell_player_standing(struct World* world);
+
+unsigned char is_cell_creaky(struct World* world, int x, int y);
