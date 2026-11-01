@@ -18,7 +18,7 @@ void free_map(char** map, int height, int width);
 void print_map(char** map, int height, int width, int player_position_x, int player_position_y);
 
 //Возвращает указатель на мир с игроком
-struct World* get_world();
+struct World* get_world(unsigned char generate_up_ladder);
 
 void free_world(struct World* world);
 
