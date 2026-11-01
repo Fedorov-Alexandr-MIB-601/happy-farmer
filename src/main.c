@@ -14,6 +14,7 @@
 #include <Windows.h>
 #endif
 
+#include <time.h>
 
 
 //		----	ПЕРЕМЕННЫЕ		----
@@ -46,6 +47,8 @@ int main()
 	SetConsoleCP(65001);
 	SetConsoleOutputCP(65001); //Тимофей Владиславович сказал, это надо чтобы было без кракозябр в выводе
 #endif
+
+	srand(time(NULL));
 
 	redraw_to_header();
 	
