@@ -131,7 +131,7 @@ unsigned char try_move_player(struct World* world, int direction_x, int directio
 }
 
 void get_random_empty_cell(struct World* world, int* out_x, int* out_y) {
-	while (TRUE) {
+	for (int atmpt = 0; atmpt < 100; atmpt++) {
 		int test_x = rand() % world->map_width;
 		int test_y = rand() % world->map_height;
 		if (is_cell_empty(world, test_x, test_y)) {
@@ -140,6 +140,21 @@ void get_random_empty_cell(struct World* world, int* out_x, int* out_y) {
 			return;
 		}
 	}
+
+	for (int y = 0; y < world->map_height; y++)
+	{
+		for (int x = 0; x < world->map_width; x++)
+		{
+			if (is_cell_empty(world, x, y)) {
+				*out_x = x;
+				*out_y = y;
+				return;
+			}
+		}
+	}
+
+	*out_x = -1;
+	*out_y = -1;
 }
 
 char* get_cell(struct World* world, int x, int y) {
