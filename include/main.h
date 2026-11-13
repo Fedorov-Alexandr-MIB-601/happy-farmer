@@ -1,4 +1,7 @@
 #pragma once
+
+#include "constants.h"
+
 //		----	Функции сепарации логики		----
 int setup();
 int loop(); //Вернуть 0, если хочешь оборвать вечный цикл
@@ -30,3 +33,10 @@ void menu_inventory_search();
 void menu_make_snapshot();
 void menu_settings_parser();
 void menu_adventure();
+
+
+//		----	Структуры	----
+typedef struct {
+	int current_day;
+	int current_hour;
+} GameState;
