@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "parser.h"
 #include "map.h"
+#include "player.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -18,8 +19,6 @@
 
 
 //		----	ПЕРЕМЕННЫЕ		----
-int current_day;
-int current_hour;
 char username[MAX_TOKEN_LENGTH];
 
 int inventory[INVENTORY_SIZE];
@@ -53,14 +52,15 @@ int main()
 	redraw_to_header();
 	
 	
+	GameState game_state;
 
 
-	if (setup() != 0) {
+	if (setup(&game_state) != 0) {
 		return 1;
 	}
 	
 	//Вот это я смешную конструкцию придумал 🤣
-	while (loop());
+	while (loop(&game_state));
 
 
 	return 0;
@@ -99,21 +99,21 @@ int load_items() {
 	return 0;
 }
 
-int setup() {
+int setup(GameState* game_state) {
 	if (load_items()) {
 		return 1;
 	}
-	init_variables();
+	init_variables(game_state);
 
-	redraw_to_header();
-	ask_username();
+	//redraw_to_header();
+	//ask_username();
 
-	get_confirm();
+	//get_confirm();
 	return 0;
 }
 
-void show_time() {
-	printf("День %d, %s", current_day, get_military_time(current_hour));
+void show_time(GameState* game_state) {
+	printf("День %d, %s", game_state->current_day, get_military_time(game_state->current_hour));
 }
 void print_id_to_item() {
 	for (int i = 1; i < MAX_ITEMS_COUNT; i++)
@@ -123,14 +123,11 @@ void print_id_to_item() {
 
 }
 
-void init_variables()
+void init_variables(GameState* game_state)
 {
-	current_day = START_DAY;
-	current_hour = START_HOUR;
-	for (int i = 0; i < INVENTORY_SIZE; i++)
-	{
-		inventory[i] = rand() % MAX_ITEMS_COUNT;
-	}
+	game_state->current_day = START_DAY;
+	game_state->current_hour = START_HOUR;
+	
 }
 
 
@@ -149,7 +146,7 @@ void ask_username() {
 }
 
 
-int loop() {
+int loop(GameState* game_state) {
 	redraw_to_header();
 	print_action_selection(username);
 	int user_selection = get_int_input_range("", 0, 10);
@@ -163,12 +160,12 @@ int loop() {
 
 	case SELECTION_CHECK_TIME:
 		printf("Текущее время: ");
-		show_time();
+		show_time(game_state);
 		printf("\n\n");
 		break;
 
 	case SELECTION_WORK:
-		menu_work();
+		menu_work(game_state);
 		break;
 
 	case SELECTION_CHECK_INVENTORY:
@@ -187,7 +184,7 @@ int loop() {
 		menu_inventory_search();
 		break;
 	case SELECTION_MAKE_SNAPSHOT:
-		menu_make_snapshot();
+		menu_make_snapshot(game_state);
 		break;
 	case SELECTION_SETTINGS_PARSER:
 		menu_settings_parser();
@@ -205,11 +202,11 @@ int loop() {
 
 
 
-void feed_forward_time(int hours_to_skip) {
-	current_hour += hours_to_skip;
-	int days_passed = current_hour / HOURS_IN_DAY;
-	current_hour %= HOURS_IN_DAY;
-	current_day += days_passed;
+void feed_forward_time(GameState* game_state, int hours_to_skip) {
+	game_state->current_hour += hours_to_skip;
+	int days_passed = game_state->current_hour / HOURS_IN_DAY;
+	game_state->current_hour %= HOURS_IN_DAY;
+	game_state->current_day += days_passed;
 }
 
 int set_item(int slot_index, int item_id) {
@@ -237,7 +234,7 @@ int count_items(int item_id) {
 }
 
 
-void menu_work() {
+void menu_work(GameState* game_state) {
 	int work_hours = 0;
 	while (1) {
 		work_hours = get_int_input("Сколько часов вы хотите работать?");
@@ -252,12 +249,12 @@ void menu_work() {
 	}
 	else {
 		printf("Начинаю работать в ");
-		show_time();
+		show_time(game_state);
 		printf("\n");
 		printf("Работаю %d часов...\n", work_hours);
-		feed_forward_time(work_hours);
+		feed_forward_time(game_state, work_hours);
 		printf("Закончил работать в ");
-		show_time();
+		show_time(game_state);
 		printf("\n\n");
 	}
 }
@@ -372,12 +369,12 @@ void menu_inventory_search() {
 
 
 
-void menu_make_snapshot() {
+void menu_make_snapshot(GameState* game_state) {
 	//На экран и в файл
 	FILE* fp = fopen("diary.txt", "a");
 	FILE* stream = stdout;
 	for (int i = 0; i < 2; i++) {
-		fprintf(stream, "---- Зпись от %d дня в %s ----\n", current_day, get_military_time(current_hour));
+		fprintf(stream, "---- Зпись от %d дня в %s ----\n", game_state->current_day, get_military_time(game_state->current_hour));
 		fprintf(stream, "Фермер по имени   %s   имеет у себя в рюкзаке:\n", username);
 		for (int item_id = 1; item_id < MAX_ITEMS_COUNT; item_id++)
 		{
@@ -434,6 +431,9 @@ void menu_settings_parser() {
 
 
 void menu_adventure() {
+	
+
+
 	int frame_counter = 0;
 	char last_input = 0;
 	int depth = 1;
@@ -473,9 +473,9 @@ void menu_adventure() {
 				}
 			}
 			else if (player_cell == '.') {
-				if (is_cell_creaky(world, world->player_position_x, world->player_position_y)) {
+				if (is_cell_creaky(world, world->player->x, world->player->y)) {
 					printf("\n\033[31mОсторожно, скрипучий пол!\033[0m\n");
-					*get_cell(world, world->player_position_x, world->player_position_y) = ',';
+					*get_cell(world, world->player->x, world->player->y) = ',';
 				}
 			}
 

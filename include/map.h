@@ -1,9 +1,10 @@
 #pragma once
+#include "player.h"
 
 //карта и игрок в ней
 typedef struct
 {
-	int player_position_x, player_position_y;
+	Player* player;
 	int map_height, map_width;
 	char** map;
 	unsigned char** creaky_floor;

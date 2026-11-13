@@ -8,6 +8,6 @@ typedef struct {
     int stamina;
     int max_stamina;
     int gold;
-    int x, y; // Координаты на карте приключения Zachem?
+    int x, y; // Координаты на карте приключения
     int inventory[MAX_ITEMS_COUNT];
 } Player;

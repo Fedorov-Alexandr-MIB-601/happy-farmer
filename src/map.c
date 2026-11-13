@@ -105,7 +105,7 @@ World* get_world(unsigned char generate_up_ladder) {
 	World* world = malloc(sizeof(World));
 	
 	world->map = generate_map(&(world->map_height), &(world->map_width));
-	get_random_empty_cell(world, &(world->player_position_x), &(world->player_position_y));
+	get_random_empty_cell(world, &(world->player->x), &(world->player->y));
 
 
 	world->creaky_floor = (unsigned char**)malloc(world->map_height * sizeof(char*));
@@ -130,7 +130,7 @@ World* get_world(unsigned char generate_up_ladder) {
 	set_cell_to_random_free_pos(world, 'D');
 
 	if (generate_up_ladder)
-		set_cell_to_random_free_pos_radius_square(world, 'U', world->player_position_x, world->player_position_y, 1);
+		set_cell_to_random_free_pos_radius_square(world, 'U', world->player->x, world->player->y, 1);
 
 
 
@@ -149,7 +149,7 @@ void free_world(World* world) {
 }
 
 void print_world(World* world) {
-	print_map(world->map, world->map_height, world->map_width, world->player_position_x, world->player_position_y);
+	print_map(world->map, world->map_height, world->map_width, world->player->x, world->player->y);
 }
 
 unsigned char is_cell_blocked(World* world, int x, int y) {
@@ -167,8 +167,8 @@ unsigned char is_cell_empty(World* world, int x, int y) {
 }
 
 unsigned char try_move_player(World* world, int direction_x, int direction_y) {
-	int pos_x = world->player_position_x;
-	int pos_y = world->player_position_y;
+	int pos_x = world->player->x;
+	int pos_y = world->player->y;
 
 	//Вообще из-за стен по краям этого никогда не случится, но всё же
 	if (pos_x + direction_x < 0) return FALSE;
@@ -177,8 +177,8 @@ unsigned char try_move_player(World* world, int direction_x, int direction_y) {
 	if (pos_y + direction_y >= world->map_height) return FALSE;
 
 	if (!is_cell_blocked(world, pos_x + direction_x, pos_y + direction_y)) {
-		world->player_position_x = pos_x + direction_x;
-		world->player_position_y = pos_y + direction_y;
+		world->player->x = pos_x + direction_x;
+		world->player->y = pos_y + direction_y;
 		return TRUE;
 	}
 	
@@ -242,7 +242,7 @@ char* get_cell(World* world, int x, int y) {
 }
 
 char* get_cell_player_standing(World* world) {
-	return get_cell(world, world->player_position_x, world->player_position_y);
+	return get_cell(world, world->player->x, world->player->y);
 }
 
 unsigned char is_cell_creaky(World* world, int x, int y) {
