@@ -444,7 +444,7 @@ void menu_adventure() {
 		unsigned char exit = FALSE;
 
 		
-		struct World* world = get_world(generate_up_ladder);
+		World* world = get_world(generate_up_ladder);
 		if (generate_up_ladder == FALSE)
 			generate_up_ladder = TRUE;
 

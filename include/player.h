@@ -1,4 +1,5 @@
 #pragma once
+#include "constants.h"
 
 typedef struct {
     char name[MAX_TOKEN_LENGTH];

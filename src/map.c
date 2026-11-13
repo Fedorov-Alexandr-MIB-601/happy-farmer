@@ -83,26 +83,26 @@ void print_map(char** map, int height, int width, int player_position_x, int pla
 	}
 }
 
-void set_cell(struct World* world, int x, int y, char cell) {
+void set_cell(World* world, int x, int y, char cell) {
 	*get_cell(world, x, y) = cell;
 }
 
-void set_cell_to_random_free_pos(struct World* world, char cell) {
+void set_cell_to_random_free_pos(World* world, char cell) {
 	int pos_x;
 	int pos_y;
 	get_random_empty_cell(world, &pos_x, &pos_y);
 	set_cell(world, pos_x, pos_y, cell);
 }
 
-void set_cell_to_random_free_pos_radius_square(struct World* world, char cell, int center_x, int center_y, int radius) {
+void set_cell_to_random_free_pos_radius_square(World* world, char cell, int center_x, int center_y, int radius) {
 	int pos_x;
 	int pos_y;
 	get_random_empty_cell_radius_square(world, &pos_x, &pos_y, center_x, center_y, radius);
 	set_cell(world, pos_x, pos_y, cell);
 }
 
-struct World* get_world(unsigned char generate_up_ladder) {
-	struct World* world = malloc(sizeof(struct World));
+World* get_world(unsigned char generate_up_ladder) {
+	World* world = malloc(sizeof(World));
 	
 	world->map = generate_map(&(world->map_height), &(world->map_width));
 	get_random_empty_cell(world, &(world->player_position_x), &(world->player_position_y));
@@ -139,7 +139,7 @@ struct World* get_world(unsigned char generate_up_ladder) {
 	return world;
 }
 
-void free_world(struct World* world) {
+void free_world(World* world) {
 	free_map(world->map, world->map_height, world->map_width);
 	for (int y = 0; y < world->map_height; y++) {
 		free(world->creaky_floor[y]);
@@ -148,25 +148,25 @@ void free_world(struct World* world) {
 	free(world);
 }
 
-void print_world(struct World* world) {
+void print_world(World* world) {
 	print_map(world->map, world->map_height, world->map_width, world->player_position_x, world->player_position_y);
 }
 
-unsigned char is_cell_blocked(struct World* world, int x, int y) {
+unsigned char is_cell_blocked(World* world, int x, int y) {
 	if (*get_cell(world, x, y) == '#') return TRUE;
 	if (*get_cell(world, x, y) == 'R') return TRUE;
 	if (*get_cell(world, x, y) == 'T') return TRUE;
 	return FALSE;
 }
 
-unsigned char is_cell_empty(struct World* world, int x, int y) {
+unsigned char is_cell_empty(World* world, int x, int y) {
 	char* cell = get_cell(world, x, y);
 	if (cell != NULL)
 		if (*cell == '.') return TRUE;
 	return FALSE;
 }
 
-unsigned char try_move_player(struct World* world, int direction_x, int direction_y) {
+unsigned char try_move_player(World* world, int direction_x, int direction_y) {
 	int pos_x = world->player_position_x;
 	int pos_y = world->player_position_y;
 
@@ -186,7 +186,7 @@ unsigned char try_move_player(struct World* world, int direction_x, int directio
 
 }
 
-void get_first_empty_cell(struct World* world, int* out_x, int* out_y) {
+void get_first_empty_cell(World* world, int* out_x, int* out_y) {
 	for (int y = 0; y < world->map_height; y++)
 	{
 		for (int x = 0; x < world->map_width; x++)
@@ -203,7 +203,7 @@ void get_first_empty_cell(struct World* world, int* out_x, int* out_y) {
 	*out_y = -1;
 }
 
-void get_random_empty_cell(struct World* world, int* out_x, int* out_y) {
+void get_random_empty_cell(World* world, int* out_x, int* out_y) {
 	for (int atmpt = 0; atmpt < 100; atmpt++) {
 		int test_x = rand() % world->map_width;
 		int test_y = rand() % world->map_height;
@@ -219,7 +219,7 @@ void get_random_empty_cell(struct World* world, int* out_x, int* out_y) {
 
 
 
-void get_random_empty_cell_radius_square(struct World* world, int* out_x, int* out_y, int center_x, int center_y, int radius) {
+void get_random_empty_cell_radius_square(World* world, int* out_x, int* out_y, int center_x, int center_y, int radius) {
 	for (int atmpt = 0; atmpt < 100; atmpt++) {
 		int test_x = rand_range(center_x - radius, center_x + radius + 1);
 		int test_y = rand_range(center_y - radius, center_y + radius + 1);
@@ -233,7 +233,7 @@ void get_random_empty_cell_radius_square(struct World* world, int* out_x, int* o
 	get_first_empty_cell(world, out_x, out_y);
 }
 
-char* get_cell(struct World* world, int x, int y) {
+char* get_cell(World* world, int x, int y) {
 	if (x < 0 || x >= world->map_width || y < 0 || y >= world->map_height)
 		return NULL;
 
@@ -241,10 +241,10 @@ char* get_cell(struct World* world, int x, int y) {
 
 }
 
-char* get_cell_player_standing(struct World* world) {
+char* get_cell_player_standing(World* world) {
 	return get_cell(world, world->player_position_x, world->player_position_y);
 }
 
-unsigned char is_cell_creaky(struct World* world, int x, int y) {
+unsigned char is_cell_creaky(World* world, int x, int y) {
 	return world->creaky_floor[y][x];
 }

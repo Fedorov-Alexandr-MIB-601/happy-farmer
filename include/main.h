@@ -1,6 +1,8 @@
 #pragma once
 
 #include "constants.h"
+#include "player.h"
+#include "map.h"
 
 //		----	Функции сепарации логики		----
 int setup();
@@ -39,4 +41,7 @@ void menu_adventure();
 typedef struct {
 	int current_day;
 	int current_hour;
+	Player* player;
+	World* world;
+
 } GameState;
