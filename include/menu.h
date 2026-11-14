@@ -12,7 +12,8 @@ int clear_item(Player* player, int slot_index);
 int count_items(Player* player, int item_id);
 
 //		----	Функции выбора из меню			----
-void menu_work(GameState* game_state);
+void menu_check_time(GameState* game_state);
+void menu_skip_time(GameState* game_state);
 void menu_check_inventory(GameState* game_state);
 void menu_set_item(GameState* game_state);
 void menu_drop_item(GameState* game_state);
@@ -22,3 +23,5 @@ void menu_make_snapshot(GameState* game_state);
 void menu_settings_parser();
 void menu_adventure(GameState* game_state);
 
+
+void menu_time_management(GameState* game_state);

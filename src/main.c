@@ -136,11 +136,13 @@ void ask_username(Player* player) {
 }
 
 
+
+
 int loop(GameState* game_state) {
 	redraw_to_header();
 
 	Player* player = game_state->player;
-	if (player == NULL)
+	if (is_player_null(player))
 		print_action_selection("Ноунейм");
 	else
 		print_action_selection(player->username);
@@ -153,16 +155,17 @@ int loop(GameState* game_state) {
 		printf("Выход из программы...\n");
 		return 0;
 
-	case SELECTION_CHECK_TIME:
-		printf("Текущее время: ");
-		show_time(game_state);
-		printf("\n\n");
+	case SELECTION_MAKE_CHARACTER:
+		menu_check_time(game_state);
 		break;
 
-	case SELECTION_WORK:
-		menu_work(game_state);
+	case SELECTION_CHARACTER_CARD:
+		menu_skip_time(game_state);
 		break;
-
+	case SELECTION_TIME_MANAGMENT:
+		menu_time_management(game_state);
+		break;
+		
 	case SELECTION_CHECK_INVENTORY:
 		if (is_player_null(player)) 
 			print_character_not_exist();
@@ -180,12 +183,6 @@ int loop(GameState* game_state) {
 			print_character_not_exist();
 		else
 			menu_drop_item(game_state);
-		break;
-	case SELECTION_INVENTORY_REVISION:
-		if (is_player_null(player))
-			print_character_not_exist();
-		else
-			menu_inventory_revision(game_state);
 		break;
 	case SELECTION_INVENTORY_SEARCH:
 		if (is_player_null(player))

@@ -8,6 +8,7 @@ void redraw_to_header();
 void get_confirm();
 
 void print_action_selection(char* username);
+void print_time_submenu_selection(char* username);
 int get_int_input(const char* message);
 int get_int_input_range(const char* message, int lowest_value, int highest_value);
 void get_string_input(const char* message, char* buffer);

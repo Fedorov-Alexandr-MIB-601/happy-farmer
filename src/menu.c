@@ -40,12 +40,20 @@ int count_items(Player* player, int item_id) {
 
 
 
+void menu_check_time(GameState* game_state) {
+	printf("Текущее время: ");
+	show_time(game_state);
+	printf("\n\n");
+}
 
-
-void menu_work(GameState* game_state) {
+void menu_skip_time(GameState* game_state) {
+	if (game_state->current_hour == 2) {
+		printf("Уже 02:00 на часах, кажется, пора баиньки\n");
+		return;
+	}
 	int work_hours = 0;
 	while (1) {
-		work_hours = get_int_input("Сколько часов вы хотите работать?");
+		work_hours = get_int_input("Сколько часов вы хотите пропустить?");
 		if (work_hours < 0) {
 			printf("Вы путешественник во времени?\n");
 			continue;
@@ -53,15 +61,22 @@ void menu_work(GameState* game_state) {
 		break;
 	}
 	if (work_hours == 0) {
-		printf("Вы решили не работать...\n\n");
+		printf("Вы решили не тратить время впустую...\n\n");
 	}
 	else {
-		printf("Начинаю работать в ");
+		printf("Начинаю филонить в ");
 		show_time(game_state);
 		printf("\n");
-		printf("Работаю %d часов...\n", work_hours);
+
+		int possible_work_time = HOURS_IN_DAY + 2 - game_state->current_hour;
+
+		if (work_hours > possible_work_time)
+			work_hours = possible_work_time;
+			
+
+		printf("Бездельничаю %d часов...\n", work_hours);
 		feed_forward_time(game_state, work_hours);
-		printf("Закончил работать в ");
+		printf("Закончил дармоедить в ");
 		show_time(game_state);
 		printf("\n\n");
 	}
@@ -341,4 +356,29 @@ void menu_adventure(GameState* game_state) {
 		}
 	}
 
+}
+
+
+void menu_time_management(GameState* game_state) {
+	if (game_state->player == NULL)
+		print_time_submenu_selection("Ноунейм");
+	else
+		print_time_submenu_selection(game_state->player->username);
+	int user_selection = get_int_input_range("", 0, 3);
+	redraw_to_header();
+	switch (user_selection) {
+	case TIME_MENU_SELECTION_EXIT:
+		printf("Возврат назад...\n");
+		return;
+
+	case TIME_MENU_SELECTION_CHECK_TIME:
+		menu_check_time(game_state);
+		break;
+
+	case TIME_MENU_SELECTION_SKIP_TIME:
+		menu_skip_time(game_state);
+		break;
+	case TIME_MENU_SELECTION_SLEEP:
+		break;
+	}
 }

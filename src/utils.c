@@ -23,7 +23,7 @@ void clear_screen() {
 
 void print_title() {
 	printf("|-------------------------------|\n");
-	printf("| H A P P Y   F A R M E R v0.03 |\n");
+	printf("| H A P P Y   F A R M E R v0.04 |\n");
 	printf("|-------------------------------|\n\n");
 }
 
@@ -42,16 +42,25 @@ void print_action_selection(char* username)
 
 	printf("Что ты выберешь, %s?\n", username);
 	printf("[0]  - Выход\n");
-	printf("[1]  - Посмотреть на часы\n");
-	printf("[2]  - Поработать\n");
-	printf("[3]  - Посмотреть инвентарь\n");
-	printf("[4]  - Положить предмет в слот\n");
-	printf("[5]  - Выбросить предмет\n");
-	printf("[6]  - Ревизия ресурсов\n");
+	printf("[1]  - Создать персонажа\n");
+	printf("[2]  - Карточка персонажа\n");
+	printf("[3]  - Управление временем\n");
+	printf("[4]  - Посмотреть инвентарь\n");
+	printf("[5]  - Положить предмет в слот\n");
+	printf("[6]  - Выбросить предмет\n");
 	printf("[7]  - Поиск предмета в рюкзаке по названию\n");
 	printf("[8]  - Записать состояние в дневник фермера\n");
 	printf("[9]  - Парсер файла настроек\n");
 	printf("[10] - Отправиться в приключение\n");
+
+}
+
+void print_time_submenu_selection(char* username) {
+	printf("Что ты выберешь, %s?\n", username);
+	printf("[0] - Назад\n");
+	printf("[1] - Посмотреть на часы\n");
+	printf("[2] - Ждать\n");
+	printf("[3] - Лечь спать\n");
 
 }
 
