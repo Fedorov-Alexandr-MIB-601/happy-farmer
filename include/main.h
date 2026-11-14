@@ -16,7 +16,6 @@ void ask_username(Player* player);
 
 
 
-//		----	Функции для работы с файлами	----
-int parse_config(const char* filepath, char*** keys, char*** values, int* pairs_count);
+
 
 unsigned char is_player_null(Player* player);

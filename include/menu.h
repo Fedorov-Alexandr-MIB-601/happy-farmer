@@ -21,3 +21,4 @@ void menu_inventory_search(GameState* game_state);
 void menu_make_snapshot(GameState* game_state);
 void menu_settings_parser();
 void menu_adventure(GameState* game_state);
+
