@@ -18,27 +18,6 @@
 #include <time.h>
 
 
-//		----	ПЕРЕМЕННЫЕ		----
-char username[MAX_TOKEN_LENGTH];
-
-int inventory[INVENTORY_SIZE];
-
-
-
-char item_id_to_name[MAX_ITEMS_COUNT][MAX_TOKEN_LENGTH] = {
-	"Пусто",
-	"Дерево",
-	"Камень",
-	"Семена",
-	"Лопата",
-	"Лейка",
-	"Лукошко",
-	"Яблоко",
-	"Морковка",
-	"Ягода"
-};
-//
-
 
 int main() 
 {
@@ -51,9 +30,11 @@ int main()
 
 	redraw_to_header();
 	
+	 
+
 	
 	GameState game_state;
-
+	game_state.player = NULL;
 
 	if (setup(&game_state) != 0) {
 		return 1;
@@ -66,8 +47,26 @@ int main()
 	return 0;
 }
 
-int load_items() {
+int load_items(GameState* game_state) {
 	printf("Загружаю предметы...\n");
+	char DEFAULT_NAMES[MAX_ITEMS_COUNT][MAX_TOKEN_LENGTH] = {
+		"Пусто",
+		"Дерево",
+		"Камень",
+		"Семена",
+		"Лопата",
+		"Лейка",
+		"Лукошко",
+		"Яблоко",
+		"Морковка",
+		"Ягода"
+	};
+
+	for (int i = 0; i < MAX_ITEMS_COUNT; i++)
+	{
+		strcpy(game_state->item_id_to_name[i], DEFAULT_NAMES[i]);
+	}
+
 	char** keys;
 	char** values;
 	int pairs_count;
@@ -85,7 +84,7 @@ int load_items() {
 		//Пришлось добавить проверку, потому что мне почему-то никто не сказал, что я залез в чужую память, например в 10 индекс, странно
 		//Кажется ошбки не было, потому что я залез не в память чужой программы, а своей же
 		if (index >= 0 && index < MAX_ITEMS_COUNT) 
-			strcpy(item_id_to_name[index], values[i]);
+			strcpy(game_state->item_id_to_name[index], values[i]);
 		
 		free(keys[i]);
 	}
@@ -100,7 +99,7 @@ int load_items() {
 }
 
 int setup(GameState* game_state) {
-	if (load_items()) {
+	if (load_items(game_state)) {
 		return 1;
 	}
 	init_variables(game_state);
@@ -115,10 +114,10 @@ int setup(GameState* game_state) {
 void show_time(GameState* game_state) {
 	printf("День %d, %s", game_state->current_day, get_military_time(game_state->current_hour));
 }
-void print_id_to_item() {
+void print_id_to_item(GameState* game_state) {
 	for (int i = 1; i < MAX_ITEMS_COUNT; i++)
 	{
-		printf("[%d] - %s\n", i, item_id_to_name[i]);
+		printf("[%d] - %s\n", i, game_state->item_id_to_name[i]);
 	}
 
 }
@@ -134,12 +133,12 @@ void init_variables(GameState* game_state)
 
 
 
-void ask_username() {
-	get_string_input("Привет, меня зовут Ёжик. А как зовут тебя?\nНапиши своё имя и фамилию, чтобы мы тебя узнавали:", (char*)username);
-	if (strcmp(username, "") == 0)
+void ask_username(Player* player) {
+	get_string_input("Привет, меня зовут Ёжик. А как зовут тебя?\nНапиши своё имя и фамилию, чтобы мы тебя узнавали:", (char*)(player->username));
+	if (strcmp(player->username, "") == 0)
 	{
 		printf("Значит будешь Анонимом.\n");
-		strcpy(username, "Аноним");
+		strcpy(player->username, "Аноним");
 	}
 	else
 		printf("Ого! Я тебя узнал!\n");
@@ -148,7 +147,12 @@ void ask_username() {
 
 int loop(GameState* game_state) {
 	redraw_to_header();
-	print_action_selection(username);
+
+	Player* player = game_state->player;
+	if (player == NULL)
+		print_action_selection("Ноунейм");
+	else
+		print_action_selection(player->username);
 	int user_selection = get_int_input_range("", 0, 10);
 	redraw_to_header();
 
@@ -169,28 +173,49 @@ int loop(GameState* game_state) {
 		break;
 
 	case SELECTION_CHECK_INVENTORY:
-		menu_check_inventory();
+		if (is_player_null(player)) 
+			print_character_not_exist();
+		else
+			menu_check_inventory(game_state);
 		break;
 	case SELECTION_SET_ITEM:
-		menu_set_item();
+		if (is_player_null(player))
+			print_character_not_exist();
+		else
+			menu_set_item(game_state);
 		break;
 	case SELECTION_DROP_ITEM:
-		menu_drop_item();
+		if (is_player_null(player))
+			print_character_not_exist();
+		else
+			menu_drop_item(game_state);
 		break;
 	case SELECTION_INVENTORY_REVISION:
-		menu_inventory_revision();
+		if (is_player_null(player))
+			print_character_not_exist();
+		else
+			menu_inventory_revision(game_state);
 		break;
 	case SELECTION_INVENTORY_SEARCH:
-		menu_inventory_search();
+		if (is_player_null(player))
+			print_character_not_exist();
+		else
+			menu_inventory_search(game_state);
 		break;
 	case SELECTION_MAKE_SNAPSHOT:
-		menu_make_snapshot(game_state);
+		if (is_player_null(player))
+			print_character_not_exist();
+		else
+			menu_make_snapshot(game_state);
 		break;
 	case SELECTION_SETTINGS_PARSER:
 		menu_settings_parser();
 		break;
 	case SELECTION_ADVENTURE:
-		menu_adventure();
+		if (is_player_null(player))
+			print_character_not_exist();
+		else
+			menu_adventure(game_state);
 		break;
 	default:
 		printf("Такого действия нет!\n");
@@ -209,25 +234,25 @@ void feed_forward_time(GameState* game_state, int hours_to_skip) {
 	game_state->current_day += days_passed;
 }
 
-int set_item(int slot_index, int item_id) {
+int set_item(Player* player, int slot_index, int item_id) {
 	if (slot_index < 0 || slot_index > INVENTORY_SIZE)
 		return 0;
 	if (item_id < 0 || item_id > MAX_ITEMS_COUNT)
 		return 0;
 
-	inventory[slot_index] = item_id;
+	player->inventory[slot_index] = item_id;
 	return 1;
 }
 
-int clear_item(int slot_index) {
-	return set_item(slot_index, 0);
+int clear_item(Player* player, int slot_index) {
+	return set_item(slot_index, 0, player);
 }
 
-int count_items(int item_id) {
+int count_items(Player* player, int item_id) {
 	int items_count = 0;
 	for (int i = 0; i < INVENTORY_SIZE; i++)
 	{
-		if (inventory[i] == item_id)
+		if (player->inventory[i] == item_id)
 			items_count++;
 	}
 	return items_count;
@@ -259,11 +284,11 @@ void menu_work(GameState* game_state) {
 	}
 }
 
-void menu_check_inventory() {
+void menu_check_inventory(GameState* game_state) {
 	printf("Вот что у меня в карманах:\n");
 	for (int i = 0; i < INVENTORY_SIZE; i++)
 	{
-		printf("Слот %d: %s\n", i, item_id_to_name[ inventory[i] ]);
+		printf("Слот %d: %s\n", i, game_state->item_id_to_name[ game_state->player->inventory[i] ]);
 	}
 	printf("\n");
 }
@@ -271,40 +296,40 @@ void menu_check_inventory() {
 
 
 
-void menu_set_item() {
+void menu_set_item(GameState* game_state) {
 	int slot_index = get_int_input_range("Введите индекс слота для установки предмета", 0, INVENTORY_SIZE - 1);
-	int old_item = inventory[slot_index];
+	int old_item = game_state->player->inventory[slot_index];
 
-	print_id_to_item();
+	print_id_to_item(game_state);
 	int item_id = get_int_input_range("Введите айдишник желаемого предмета", 1, MAX_ITEMS_COUNT - 1);
 	
 	if (old_item == 0)
-		printf("Устанавливаю предмет %s в слот %d...", item_id_to_name[item_id], slot_index);
+		printf("Устанавливаю предмет %s в слот %d...", game_state->item_id_to_name[item_id], slot_index);
 	else
-		printf("Заменяю предмет %s в слоте %d на %s...", item_id_to_name[old_item], slot_index, item_id_to_name[item_id]);
+		printf("Заменяю предмет %s в слоте %d на %s...", game_state->item_id_to_name[old_item], slot_index, game_state->item_id_to_name[item_id]);
 	
-	set_item(slot_index, item_id);
+	set_item(game_state->player, slot_index, item_id);
 	printf("\n\n");
 }
 
-void menu_drop_item() {
+void menu_drop_item(GameState* game_state) {
 	int slot_index = get_int_input_range("Введите индекс слота из которого нужно выбросить предмет", 0, INVENTORY_SIZE - 1);
-	int old_item = inventory[slot_index];
+	int old_item = game_state->player->inventory[slot_index];
 
 	if (old_item == 0)
 		printf("В этом слоте уже ничего не было...");
 	else
-		printf("Выбрасываю предмет %s из слота %d...", item_id_to_name[old_item], slot_index);
+		printf("Выбрасываю предмет %s из слота %d...", game_state->item_id_to_name[old_item], slot_index);
 
-	clear_item(slot_index);
+	clear_item(game_state->player, slot_index);
 	printf("\n\n");
 }
 
-void menu_inventory_revision() {
-	print_id_to_item();
+void menu_inventory_revision(GameState* game_state) {
+	print_id_to_item(game_state);
 	int item_id = get_int_input_range("Введите айдишник предмета для ревизии", 1, MAX_ITEMS_COUNT - 1);
 
-	int items_count = count_items(item_id);
+	int items_count = count_items(game_state->player, item_id);
 	
 	if (items_count == 0) {
 		printf("У меня нет такого предмета((\n");
@@ -312,19 +337,19 @@ void menu_inventory_revision() {
 	else if(items_count == 1) {
 		for (int i = 0; i < INVENTORY_SIZE; i++)
 		{
-			if (inventory[i] == item_id) {
-				printf("Единственный предмет '%s' лежит в слоте %d\n", item_id_to_name[item_id], i);
+			if (game_state->player->inventory[i] == item_id) {
+				printf("Единственный предмет '%s' лежит в слоте %d\n", game_state->item_id_to_name[item_id], i);
 				break;
 			}
 		}
 		
 	}
 	else {
-		printf("Количество предметов '%s' - %d\n", item_id_to_name[item_id], items_count);
+		printf("Количество предметов '%s' - %d\n", game_state->item_id_to_name[item_id], items_count);
 		printf("Они лежат в слотах:");
 		for (int i = 0; i < INVENTORY_SIZE; i++)
 		{
-			if (inventory[i] == item_id) {
+			if (game_state->player->inventory[i] == item_id) {
 				printf(" %d,", i);
 			}
 		}
@@ -333,25 +358,25 @@ void menu_inventory_revision() {
 	
 
 }
-int get_item_index_by_name(char* item_name) {
+int get_item_index_by_name(GameState* game_state, char* item_name) {
 	for (int i = 0; i < MAX_ITEMS_COUNT; i++)
 	{
-		if (strcmp(item_id_to_name[i], item_name) == 0) {
+		if (strcmp(game_state->item_id_to_name[i], item_name) == 0) {
 			return i;
 		}
 	}
 	return -1;
 }
-void menu_inventory_search() {
+void menu_inventory_search(GameState* game_state) {
 	char search_bar[MAX_TOKEN_LENGTH];
-	print_id_to_item();
+	print_id_to_item(game_state);
 	get_string_input("Введите название искомого предмета", search_bar);
-	int item_id = get_item_index_by_name(search_bar);
+	int item_id = get_item_index_by_name(game_state, search_bar);
 	if (item_id == -1) {
 		printf("Такого предмета не существует!\n");
 		return;
 	}
-	int items_count = count_items(item_id);
+	int items_count = count_items(game_state->player, item_id);
 
 	if (items_count == 0) {
 		printf("У меня нет такого предмета(\n");
@@ -361,7 +386,7 @@ void menu_inventory_search() {
 	printf("Предметы типа '%s' лежат в слотах:", search_bar);
 	for (int i = 0; i < INVENTORY_SIZE; i++)
 	{
-		if (inventory[i] == item_id) {
+		if (game_state->player->inventory[i] == item_id) {
 			printf(" %d,", i);
 		}
 	}
@@ -375,12 +400,12 @@ void menu_make_snapshot(GameState* game_state) {
 	FILE* stream = stdout;
 	for (int i = 0; i < 2; i++) {
 		fprintf(stream, "---- Зпись от %d дня в %s ----\n", game_state->current_day, get_military_time(game_state->current_hour));
-		fprintf(stream, "Фермер по имени   %s   имеет у себя в рюкзаке:\n", username);
+		fprintf(stream, "Фермер по имени   %s   имеет у себя в рюкзаке:\n", game_state->player->username);
 		for (int item_id = 1; item_id < MAX_ITEMS_COUNT; item_id++)
 		{
-			int items_count = count_items(item_id);
+			int items_count = count_items(game_state->player, item_id);
 			if (items_count == 0) continue;
-			fprintf(stream, "- %s \tв количестве %d шт.\n", item_id_to_name[item_id], items_count);
+			fprintf(stream, "- %s \tв количестве %d шт.\n", game_state->item_id_to_name[item_id], items_count);
 		}
 		fprintf(stream, "\n\n\n");
 
@@ -430,7 +455,7 @@ void menu_settings_parser() {
 
 
 
-void menu_adventure() {
+void menu_adventure(GameState* game_state) {
 	
 
 
@@ -535,3 +560,12 @@ void menu_adventure() {
 
 }
 
+unsigned char is_player_null(Player* player) {
+	return player == NULL;
+}
+
+void print_character_not_exist() {
+	redraw_to_header();
+	printf("Персонаж не создан!\n");
+	printf("Пожалуйста, создайте персонажа чтобы продолжить!\n");
+}

@@ -2,12 +2,12 @@
 #include "constants.h"
 
 typedef struct {
-    char name[MAX_TOKEN_LENGTH];
+    char username[MAX_TOKEN_LENGTH];
     int hp;
     int max_hp;
     int stamina;
     int max_stamina;
     int gold;
     int x, y; // Координаты на карте приключения
-    int inventory[MAX_ITEMS_COUNT];
+    int inventory[INVENTORY_SIZE];
 } Player;
