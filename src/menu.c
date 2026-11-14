@@ -1,7 +1,9 @@
 #include "menu.h"
 
-#include "stdio.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include "utils.h"
+#include <string.h>
 
 void feed_forward_time(GameState* game_state, int hours_to_skip) {
 	game_state->current_hour += hours_to_skip;
