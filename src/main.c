@@ -245,7 +245,7 @@ int set_item(Player* player, int slot_index, int item_id) {
 }
 
 int clear_item(Player* player, int slot_index) {
-	return set_item(slot_index, 0, player);
+	return set_item(player, slot_index, 0);
 }
 
 int count_items(Player* player, int item_id) {
