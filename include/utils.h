@@ -1,4 +1,5 @@
 #pragma once
+#include "structures.h"
 
 //		----	Функции для помощи при выводе и вводе	----
 void clear_screen();
@@ -17,3 +18,8 @@ void remove_back_spaces(char* str);
 
 int rand_top(int max);
 int rand_range(int min, int max);
+
+void print_character_not_exist();
+
+void show_time(GameState* game_state);
+void print_id_to_item(GameState* game_state);

@@ -16,4 +16,5 @@ add_executable(farm_game
     src/parser.c
     src/map.c
     src/player.c
+    src/menu.c
 )

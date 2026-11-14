@@ -1,6 +1,7 @@
 #include "utils.h"
 
 #include "constants.h"
+#include "structures.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -190,4 +191,22 @@ int rand_top(int max) {
 
 int rand_range(int min, int max) {
 	return (rand_top(max - min)) + min;
+}
+
+void print_character_not_exist() {
+	redraw_to_header();
+	printf("Персонаж не создан!\n");
+	printf("Пожалуйста, создайте персонажа чтобы продолжить!\n");
+}
+
+
+void show_time(GameState* game_state) {
+	printf("День %d, %s", game_state->current_day, get_military_time(game_state->current_hour));
+}
+void print_id_to_item(GameState* game_state) {
+	for (int i = 1; i < MAX_ITEMS_COUNT; i++)
+	{
+		printf("[%d] - %s\n", i, game_state->item_id_to_name[i]);
+	}
+
 }
