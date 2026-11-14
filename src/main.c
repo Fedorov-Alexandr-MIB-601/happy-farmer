@@ -36,6 +36,7 @@ int main()
 	GameState game_state;
 	game_state.player = NULL;
 
+
 	if (setup(&game_state) != 0) {
 		return 1;
 	}
@@ -43,6 +44,9 @@ int main()
 	//Вот это я смешную конструкцию придумал 🤣
 	while (loop(&game_state));
 
+	
+	printf("Память структуры игрока по адресу %p освобождена\n", game_state.player);
+	free(game_state.player);
 
 	return 0;
 }
@@ -156,11 +160,11 @@ int loop(GameState* game_state) {
 		return 0;
 
 	case SELECTION_MAKE_CHARACTER:
-		menu_check_time(game_state);
+
 		break;
 
 	case SELECTION_CHARACTER_CARD:
-		menu_skip_time(game_state);
+
 		break;
 	case SELECTION_TIME_MANAGMENT:
 		menu_time_management(game_state);

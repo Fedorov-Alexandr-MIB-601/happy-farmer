@@ -145,6 +145,7 @@ void free_world(World* world) {
 		free(world->creaky_floor[y]);
 	}
 	free(world->creaky_floor);
+	//printf("Память структуры карты по адресу %p освобождена\n", world);
 	free(world);
 }
 
