@@ -122,6 +122,9 @@ static void test_truecolor(void) {
 		printf("\x1b[48;2;0;0;%dm ", b);
 	}
 	printf("\x1b[0m B\n\n");
+
+	
+
 }
 
 int setup(GameState* game_state) {

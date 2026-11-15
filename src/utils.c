@@ -276,3 +276,19 @@ void print_light_mode(LightMode light_mode) {
 void print_colored_gold(int value) {
 	printf("\033[33m%dG\033[0m", value);
 }
+
+void print_char_tree(int r, int g, int b) {
+	printf("\033[38;2;%d;%d;%dm▲\033[0m", r, g, b);
+}
+
+void print_char_rock(int r, int g, int b) {
+	printf("\033[38;2;%d;%d;%dm■\033[0m", r, g, b);
+}
+
+
+void print_char_tree_col(int brightness) {
+	print_char_tree(0, 255 * ((float)(brightness) / 255.0), 0);
+}
+void print_char_rock_col(int brightness) {
+	print_char_rock(0, 255 * ((float)(brightness) / 255.0), 255 * ((float)(brightness) / 255.0));
+}

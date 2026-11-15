@@ -32,3 +32,10 @@ void print_adventure_hud(GameState* game_state);
 void print_light_mode(LightMode light_mode);
 
 void print_colored_gold(int value);
+
+void print_char_tree(int r, int g, int b);
+void print_char_rock(int r, int g, int b);
+
+
+void print_char_tree_col(int brightness);
+void print_char_rock_col(int brightness);
