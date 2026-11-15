@@ -51,3 +51,4 @@ typedef enum {
 #define MAP_MAX_SIZE 30
 
 
+extern int BASE_GOLD_MULITPLIER;

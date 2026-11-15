@@ -257,6 +257,7 @@ void menu_adventure(GameState* game_state) {
 	int frame_counter = 0;
 	char last_input = 0;
 
+	Player* player = game_state->player;
 	game_state->adventure_depth = 1;
 
 	unsigned char generate_up_ladder = TRUE;
@@ -265,7 +266,7 @@ void menu_adventure(GameState* game_state) {
 		unsigned char exit = FALSE;
 
 
-		World* world = get_world(game_state->player, generate_up_ladder);
+		World* world = get_world(player, generate_up_ladder);
 		if (generate_up_ladder == FALSE)
 			generate_up_ladder = TRUE;
 
@@ -329,24 +330,27 @@ void menu_adventure(GameState* game_state) {
 			switch (last_input) {
 			case 'w':
 				if (try_move_player(world, 0, -1))
-					game_state->player->stamina--;
+					player->stamina--;
 				break;
 			case 'a':
 				if (try_move_player(world, -1, 0))
-					game_state->player->stamina--;
+					player->stamina--;
 				break;
 			case 's':
 				if (try_move_player(world, 0, 1))
-					game_state->player->stamina--;
+					player->stamina--;
 				break;
 			case 'd':
 				if (try_move_player(world, 1, 0))
-					game_state->player->stamina--;
+					player->stamina--;
 				break;
 
 			}
 
 			if (*get_cell_player_standing(world) == 'D') {
+				int reward = BASE_GOLD_MULITPLIER * game_state->adventure_depth;
+				player->gold += reward;
+
 				game_state->adventure_depth++;
 				break;
 			}

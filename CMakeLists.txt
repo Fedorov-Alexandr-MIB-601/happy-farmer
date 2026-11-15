@@ -12,6 +12,7 @@ include_directories(include)
 # Собираем исполняемый файл farm_game из всех исходников (.c)
 add_executable(farm_game 
     src/main.c
+    src/constants.c
     src/utils.c
     src/parser.c
     src/map.c
