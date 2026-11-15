@@ -30,7 +30,7 @@ typedef struct {
 
 float get_lightness_multiplier(Lantern* lantern);
 
-int get_kerosene_usage(LightMode light_mode);
+int get_kerosene_usage(Lantern* lantern);
 void lantern_decrement_kerosine(Lantern* lantern);
 
 void init_player(Player* player, char* username);
