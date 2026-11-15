@@ -254,12 +254,10 @@ void menu_settings_parser() {
 
 
 void menu_adventure(GameState* game_state) {
-
-
-
 	int frame_counter = 0;
 	char last_input = 0;
-	int depth = 1;
+
+	game_state->adventure_depth = 1;
 
 	unsigned char generate_up_ladder = TRUE;
 
@@ -276,7 +274,9 @@ void menu_adventure(GameState* game_state) {
 
 
 			redraw_to_header();
-			printf("  <>---- Подземелье ----<>   Глубина: %d\n\n", depth);
+			printf("  <>---- Подземелье ----<>\n");
+			print_adventure_hud(game_state);
+			printf("\n\n");
 
 			print_world(world);
 
@@ -291,7 +291,7 @@ void menu_adventure(GameState* game_state) {
 				}
 				else {
 					generate_up_ladder = FALSE;
-					depth++;
+					game_state->adventure_depth++;
 					break;
 				}
 			}
@@ -328,22 +328,26 @@ void menu_adventure(GameState* game_state) {
 
 			switch (last_input) {
 			case 'w':
-				try_move_player(world, 0, -1);
+				if (try_move_player(world, 0, -1))
+					game_state->player->stamina--;
 				break;
 			case 'a':
-				try_move_player(world, -1, 0);
+				if (try_move_player(world, -1, 0))
+					game_state->player->stamina--;
 				break;
 			case 's':
-				try_move_player(world, 0, 1);
+				if (try_move_player(world, 0, 1))
+					game_state->player->stamina--;
 				break;
 			case 'd':
-				try_move_player(world, 1, 0);
+				if (try_move_player(world, 1, 0))
+					game_state->player->stamina--;
 				break;
 
 			}
 
 			if (*get_cell_player_standing(world) == 'D') {
-				depth++;
+				game_state->adventure_depth++;
 				break;
 			}
 
@@ -433,18 +437,7 @@ void menu_make_character(GameState* game_state) {
 
 }
 
-void print_colored_number(int value, int max_value) {
-	int promile = 1000 * value / max_value;
-	if (promile < 333) {
-		printf("\033[31m%d\033[0m", value);
-	}
-	else if (promile < 666) {
-		printf("\033[33m%d\033[0m", value);
-	}
-	else {
-		printf("\033[32m%d\033[0m", value);
-	}
-}
+
 
 void menu_print_character(GameState* game_state) {
 	// красиво выводит его характеристики, текущую дату и время, а также содержимое инвентаря с названиями предметов.
@@ -459,13 +452,11 @@ void menu_print_character(GameState* game_state) {
 	printf("- Имя: \033[36m%s\033[0m\n", player->username);
 
 	printf("  - Здоровье: ");
-	print_colored_number(player->hp, player->max_hp);
-	printf("/%d\n", player->max_hp);
-
+	print_colored_fraction(player->hp, player->max_hp);
+	printf("\n");
 	printf("  - Выносливость: ");
-	print_colored_number(player->stamina, player->max_stamina);
-	printf("/%d\n", player->max_stamina);
-
+	print_colored_fraction(player->stamina, player->max_stamina);
+	printf("\n");
 	printf("\n");
 	printf("  - Золото: \033[33m%dG\033[0m\n", player->gold);
 

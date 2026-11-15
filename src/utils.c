@@ -219,3 +219,31 @@ void print_id_to_item(GameState* game_state) {
 	}
 
 }
+
+void print_colored_number(int value, int max_value) {
+	int promile = 1000 * value / max_value;
+	if (promile < 333) {
+		printf("\033[31m%d\033[0m", value);
+	}
+	else if (promile < 666) {
+		printf("\033[33m%d\033[0m", value);
+	}
+	else {
+		printf("\033[32m%d\033[0m", value);
+	}
+}
+
+void print_colored_fraction(int numerator, int denominator) {
+	print_colored_number(numerator, denominator);
+	printf("/%d", denominator);
+}
+
+void print_adventure_hud(GameState* game_state) {
+	printf("HP: ");
+	print_colored_fraction(game_state->player->hp, game_state->player->max_hp);
+	printf(" | Выносливость: ");
+	print_colored_fraction(game_state->player->stamina, game_state->player->max_stamina);
+	printf(" | Золото: \033[33m%dG\033[0m", game_state->player->gold);
+	printf(" | Этаж: \033[36m%d\033[0m", game_state->adventure_depth);
+	printf(" | Время: %s", get_military_time(game_state->current_hour));
+}

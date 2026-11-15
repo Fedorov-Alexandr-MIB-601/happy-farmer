@@ -6,8 +6,8 @@ void init_player(Player* player, char* username) {
 	strncpy(player->username, username, MAX_TOKEN_LENGTH);
 	player->hp = 100;
 	player->max_hp = 100;
-	player->stamina = 100;
-	player->max_stamina = 100;
+	player->stamina = 50;
+	player->max_stamina = 50;
 	player->gold = 0;
 	player->x = -1;
 	player->y = -1;

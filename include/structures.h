@@ -10,5 +10,6 @@ typedef struct {
 	int current_hour;
 	Player* player;
 	World* world;
+	int adventure_depth;
 	char item_id_to_name[MAX_ITEMS_COUNT][MAX_TOKEN_LENGTH];
 } GameState;

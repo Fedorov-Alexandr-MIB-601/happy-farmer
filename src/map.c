@@ -104,6 +104,7 @@ void set_cell_to_random_free_pos_radius_square(World* world, char cell, int cent
 World* get_world(Player* player, unsigned char generate_up_ladder) {
 	World* world = malloc(sizeof(World));
 	world->player = player;
+	
 
 	world->map = generate_map(&(world->map_height), &(world->map_width));
 	get_random_empty_cell(world, &(world->player->x), &(world->player->y));

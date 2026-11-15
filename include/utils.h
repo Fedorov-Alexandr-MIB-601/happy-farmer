@@ -24,3 +24,7 @@ void print_character_not_exist();
 
 void show_time(GameState* game_state);
 void print_id_to_item(GameState* game_state);
+
+void print_colored_number(int value, int max_value);
+void print_colored_fraction(int numerator, int denominator);
+void print_adventure_hud(GameState* game_state);
