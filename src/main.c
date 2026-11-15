@@ -160,11 +160,14 @@ int loop(GameState* game_state) {
 		return 0;
 
 	case SELECTION_MAKE_CHARACTER:
-
+		menu_make_character(game_state);
 		break;
 
 	case SELECTION_CHARACTER_CARD:
-
+		if (is_player_null(player))
+			print_character_not_exist();
+		else
+			menu_print_character(game_state);
 		break;
 	case SELECTION_TIME_MANAGMENT:
 		menu_time_management(game_state);

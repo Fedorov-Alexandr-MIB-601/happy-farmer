@@ -204,7 +204,7 @@ int rand_range(int min, int max) {
 
 void print_character_not_exist() {
 	redraw_to_header();
-	printf("Персонаж не создан!\n");
+	printf("\033[31mПерсонаж не создан!\033[0m\n");
 	printf("Пожалуйста, создайте персонажа чтобы продолжить!\n");
 }
 

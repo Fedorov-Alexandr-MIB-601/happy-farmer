@@ -11,3 +11,6 @@ typedef struct {
     int x, y; // Координаты на карте приключения
     int inventory[INVENTORY_SIZE];
 } Player;
+
+
+init_player(Player* player, char* username);

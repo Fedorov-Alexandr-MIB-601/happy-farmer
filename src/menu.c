@@ -267,7 +267,7 @@ void menu_adventure(GameState* game_state) {
 		unsigned char exit = FALSE;
 
 
-		World* world = get_world(generate_up_ladder);
+		World* world = get_world(game_state->player, generate_up_ladder);
 		if (generate_up_ladder == FALSE)
 			generate_up_ladder = TRUE;
 
@@ -381,4 +381,98 @@ void menu_time_management(GameState* game_state) {
 	case TIME_MENU_SELECTION_SLEEP:
 		break;
 	}
+}
+
+unsigned char do_you_want_to_delete_character() {
+	printf("Персонаж уже существует.\n");
+	printf("Вы уверены, что хотите удалить его и создать нового?\n");
+	printf("[0] - Оставить страго персонажа\n");
+	printf("[1] - Удалить и создать нового\n");
+	int user_selection = get_int_input_range("", 0, 1);
+	if (user_selection) {
+		return 1;
+	}
+	printf("Оставляю старого персонажа...\n");
+	return 0;
+}
+
+void make_character(GameState* game_state) {
+	printf("---- Создание персонажа ----\n");
+	Player* player = malloc(sizeof(Player));
+
+
+	char username[MAX_TOKEN_LENGTH];
+
+	get_string_input("Введите имя:", (char*)username);
+	if (strcmp(username, "") == 0)
+	{
+		printf("Значит будешь Анонимом.\n");
+		strcpy(username, "Аноним");
+	}
+	printf("Приветсвую тебя, %s!\n", username);
+
+
+	init_player(player, username);
+
+	game_state->player = player;
+	printf("Персонаж создан!");
+}
+
+void menu_make_character(GameState* game_state) {
+	if (game_state->player != NULL) {
+		if (!do_you_want_to_delete_character()) {
+			return;
+		}
+		
+		redraw_to_header();
+
+		printf("Память структуры игрока по адресу %p освобождена\n\n", game_state->player);
+		free(game_state->player);
+	}
+	make_character(game_state);
+
+}
+
+void print_colored_number(int value, int max_value) {
+	int promile = 1000 * value / max_value;
+	if (promile < 333) {
+		printf("\033[31m%d\033[0m", value);
+	}
+	else if (promile < 666) {
+		printf("\033[33m%d\033[0m", value);
+	}
+	else {
+		printf("\033[32m%d\033[0m", value);
+	}
+}
+
+void menu_print_character(GameState* game_state) {
+	// красиво выводит его характеристики, текущую дату и время, а также содержимое инвентаря с названиями предметов.
+	Player* player = game_state->player;
+	printf("---- Карточка персонажа ----\n");
+	
+	printf("- День: %d\n", game_state->current_day);
+	printf("- Время: %s\n", get_military_time(game_state->current_hour));
+
+	printf("\n");
+
+	printf("- Имя: \033[36m%s\033[0m\n", player->username);
+
+	printf("  - Здоровье: ");
+	print_colored_number(player->hp, player->max_hp);
+	printf("/%d\n", player->max_hp);
+
+	printf("  - Выносливость: ");
+	print_colored_number(player->stamina, player->max_stamina);
+	printf("/%d\n", player->max_stamina);
+
+	printf("\n");
+	printf("  - Золото: \033[33m%dG\033[0m\n", player->gold);
+
+	printf("\n\n- Инвентарь:\n");
+	for (int i = 0; i < INVENTORY_SIZE; i++)
+	{
+		printf("  - Слот %d: %s\n", i, game_state->item_id_to_name[player->inventory[i]]);
+	}
+	printf("\n\n\n");
 }
