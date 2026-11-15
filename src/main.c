@@ -112,7 +112,7 @@ int setup(GameState* game_state) {
 	//redraw_to_header();
 	//ask_username();
 
-	get_confirm();
+	//get_confirm();
 	return 0;
 }
 
