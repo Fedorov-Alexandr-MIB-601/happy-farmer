@@ -275,7 +275,7 @@ void menu_adventure(GameState* game_state) {
 
 
 			redraw_to_header();
-			printf("  <>---- Подземелье ----<>\n");
+			printf("  <>---- \033[35mПодземелье\033[0m ----<>\n");
 			print_adventure_hud(game_state);
 			printf("\n\n");
 
@@ -306,7 +306,7 @@ void menu_adventure(GameState* game_state) {
 
 			printf("\n[w] - Вверх   [s] - Вниз   [a] - Влево   [d] - Вправо   ");
 			if (player_cell == 'U') {
-				printf("[q] - Выход");
+				printf("\033[33m[q] - Выход\033[0m");
 			}
 			printf("\n>>>");
 
@@ -350,7 +350,7 @@ void menu_adventure(GameState* game_state) {
 			if (*get_cell_player_standing(world) == 'D') {
 				int reward = BASE_GOLD_MULITPLIER * game_state->adventure_depth;
 				player->gold += reward;
-
+				game_state->current_hour++;
 				game_state->adventure_depth++;
 				break;
 			}
