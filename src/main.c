@@ -102,30 +102,6 @@ int load_items(GameState* game_state) {
 	return 0;
 }
 
-static void test_truecolor(void) {
-	printf("\nTrueColor gradient:\n");
-
-	/* Градиент по красному каналу */
-	for (int r = 0; r < 256; r += 2) {
-		printf("\x1b[38;2;%d;0;0mR", r);
-	}
-	printf("\x1b[0m R\n");
-
-	/* Градиент по зелёному */
-	for (int g = 0; g < 256; g += 2) {
-		printf("\x1b[48;2;0;%d;0m ", g);
-	}
-	printf("\x1b[0m G\n");
-
-	/* Градиент по синему */
-	for (int b = 0; b < 256; b += 2) {
-		printf("\x1b[48;2;0;0;%dm ", b);
-	}
-	printf("\x1b[0m B\n\n");
-
-	
-
-}
 
 int setup(GameState* game_state) {
 	if (load_items(game_state)) {
@@ -136,7 +112,6 @@ int setup(GameState* game_state) {
 	//redraw_to_header();
 	//ask_username();
 
-	test_truecolor();
 	get_confirm();
 	return 0;
 }
