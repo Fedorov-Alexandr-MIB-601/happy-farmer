@@ -19,3 +19,6 @@ add_executable(farm_game
     src/player.c
     src/menu.c
 )
+
+# "Математические функции живут в отдельной библиотеке m — подключаем её" - Яндекс Алиса
+target_link_libraries(farm_game PRIVATE m)

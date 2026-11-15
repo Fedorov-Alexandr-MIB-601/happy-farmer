@@ -3,6 +3,7 @@
 #include "constants.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "utils.h"
 
 char** generate_map(int* out_height, int* out_width) {
@@ -49,7 +50,7 @@ void free_map(char** map, int height, int width) {
 	}
 	free(map);
 }
-#include <math.h>
+
 void print_map(char** map, int height, int width, int player_position_x, int player_position_y, float brightness_muliplier) {
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
