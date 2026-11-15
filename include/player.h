@@ -13,4 +13,4 @@ typedef struct {
 } Player;
 
 
-init_player(Player* player, char* username);
+void init_player(Player* player, char* username);

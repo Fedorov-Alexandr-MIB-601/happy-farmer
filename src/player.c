@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-init_player(Player* player, char* username) {
+void init_player(Player* player, char* username) {
 	strncpy(player->username, username, MAX_TOKEN_LENGTH);
 	player->hp = 100;
 	player->max_hp = 100;
