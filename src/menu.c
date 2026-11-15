@@ -304,7 +304,7 @@ void menu_adventure(GameState* game_state) {
 			}
 
 
-			printf("\n[w] - Вверх   [s] - Вниз   [a] - Влево   [d] - Вправо   ");
+			printf("\n[w] - Вверх   [s] - Вниз   [a] - Влево   [d] - Вправо   [l] - Фонарь   ");
 			if (player_cell == 'U') {
 				printf("\033[33m[q] - Выход\033[0m");
 			}
@@ -329,22 +329,32 @@ void menu_adventure(GameState* game_state) {
 
 			switch (last_input) {
 			case 'w':
-				if (try_move_player(world, 0, -1))
+				if (try_move_player(world, 0, -1)) {
 					player->stamina--;
+					lantern_decrement_kerosine(&(player->lantern));
+				}
 				break;
 			case 'a':
-				if (try_move_player(world, -1, 0))
+				if (try_move_player(world, -1, 0)) {
 					player->stamina--;
+					lantern_decrement_kerosine(&(player->lantern));
+				}
 				break;
 			case 's':
-				if (try_move_player(world, 0, 1))
+				if (try_move_player(world, 0, 1)) {
 					player->stamina--;
+					lantern_decrement_kerosine(&(player->lantern));
+				}
 				break;
 			case 'd':
-				if (try_move_player(world, 1, 0))
+				if (try_move_player(world, 1, 0)) {
 					player->stamina--;
+					lantern_decrement_kerosine(&(player->lantern));
+				}
 				break;
 
+			case 'l':
+				lantern_mode_menu(game_state);
 			}
 
 			if (*get_cell_player_standing(world) == 'D') {
@@ -484,6 +494,9 @@ void menu_print_character(GameState* game_state) {
 	printf("  - Выносливость: ");
 	print_colored_fraction(player->stamina, player->max_stamina);
 	printf("\n");
+	printf("  - Керосин: ");
+	print_colored_fraction(player->lantern.kerosene, player->lantern.max_kerosene);
+	printf("\n");
 	printf("\n");
 	printf("  - Золото: \033[33m%dG\033[0m\n", player->gold);
 
@@ -493,4 +506,78 @@ void menu_print_character(GameState* game_state) {
 		printf("  - Слот %d: %s\n", i, game_state->item_id_to_name[player->inventory[i]]);
 	}
 	printf("\n\n\n");
+}
+
+
+
+void lantern_mode_menu(GameState* game_state) {
+	redraw_to_header();
+	printf("--- Фонарь ---\n");
+	printf("Текущий режим: ");
+	print_light_mode(game_state->player->lantern.light_mode);
+	printf("\n");
+
+	printf("Выберите режим:\n");
+	printf("[0] - ВЫКЛЮЧЕН\n");
+	printf("[1] - ТУСКЛЫЙ\n");
+	printf("[2] - ОБЫЧНЫЙ\n");
+	printf("[3] - ЯРКИЙ\n");
+	int user_choice = get_int_input_range("", 0, 3);
+
+	game_state->player->lantern.light_mode = user_choice;
+	printf("\nПрименён режим ");
+	print_light_mode(game_state->player->lantern.light_mode);
+	get_confirm();
+
+}
+
+void buy_kerosene(GameState* game_state) {
+	printf("\n-- Покупка керосина --\n");
+	printf("Кол-во керосина в лампе: ");
+	print_colored_fraction(game_state->player->lantern.kerosene, game_state->player->lantern.max_kerosene);
+	printf("\n");
+	int amount = get_int_input_range("Введите желаемое количество керосина для покупки", 0, game_state->player->lantern.max_kerosene - game_state->player->lantern.kerosene);
+	int price = amount * COST_KEROSENE;
+
+	if (game_state->player->gold >= price) {
+		game_state->player->lantern.kerosene += amount;
+		if (game_state->player->lantern.kerosene > game_state->player->lantern.max_kerosene)
+			game_state->player->lantern.kerosene = game_state->player->lantern.max_kerosene;
+		game_state->player->gold -= price;
+		printf("\033[32mОплата произведена\033[0m\nЗаходите к нам ещё :)");
+	}
+	else {
+		printf("\033[31mНедостаточно средств!\033[0m");
+	}
+
+	get_confirm();
+	
+
+}
+
+void menu_shop(GameState* game_state) {
+	while (TRUE) {
+		redraw_to_header();
+		printf("---- Магазин ----\n");
+		printf("Золото: ");
+		print_colored_gold(game_state->player->gold);
+		printf("\n\n");
+		//Товары
+		printf("Предмет | Цена за единицу\n");
+		printf("[1] - Керосин | ");
+		print_colored_gold(COST_KEROSENE);
+		printf("\n");
+		printf("-------------------------\n\n");
+
+		printf("[0] - Покинуть магазин\n");
+
+		int user_selection = get_int_input_range("", 0, 1);
+		switch (user_selection) {
+		case 0:
+			printf("Выхожу из магазина...\n");
+			return;
+		case 1:
+			buy_kerosene(game_state);
+		}
+	}
 }

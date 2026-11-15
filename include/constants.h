@@ -26,7 +26,8 @@ typedef enum {
 	SELECTION_INVENTORY_SEARCH,
 	SELECTION_MAKE_SNAPSHOT,
 	SELECTION_SETTINGS_PARSER,
-	SELECTION_ADVENTURE
+	SELECTION_ADVENTURE,
+	SELECTION_SHOP
 } MenuSelection;
 
 typedef enum {
@@ -36,6 +37,7 @@ typedef enum {
 	TIME_MENU_SELECTION_SLEEP
 
 } TimeMenuSelection;
+
 
 #define INVENTORY_SIZE 10
 #define MAX_ITEMS_COUNT 10
@@ -52,3 +54,5 @@ typedef enum {
 
 
 extern int BASE_GOLD_MULITPLIER;
+
+extern int COST_KEROSENE;

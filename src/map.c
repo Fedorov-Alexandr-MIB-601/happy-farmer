@@ -50,19 +50,25 @@ void free_map(char** map, int height, int width) {
 	free(map);
 }
 #include <math.h>
-void print_map(char** map, int height, int width, int player_position_x, int player_position_y) {
+void print_map(char** map, int height, int width, int player_position_x, int player_position_y, float brightness_muliplier) {
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
-			if (x == player_position_x && y == player_position_y)
+			if (x == player_position_x && y == player_position_y) {
+				printf("\033[0m");
 				printf("\033[33m@");
 				//putc('@', stdout);
+			}
 			else {
 				float distance_x = x - player_position_x;
 				float distance_y = y - player_position_y;
 				float distance = sqrt(distance_x * distance_x + distance_y * distance_y);
-				int brightness = (int)(256.0 / (distance * 0.3));
+				int brightness = (int)(256.0 / (distance * brightness_muliplier));
 				
 				switch (map[y][x]) {
+				case '#':
+					printf("\033[38;2;%d;%d;%dm", 255, 255, 255);
+					printf("%c", map[y][x]);
+					break;
 				case 'R':
 					printf("\033[38;2;%d;%d;%dm", 0, brightness, brightness);
 					printf("%c", map[y][x]);
@@ -72,11 +78,11 @@ void print_map(char** map, int height, int width, int player_position_x, int pla
 					printf("%c", map[y][x]);
 					break;
 				case 'U':
-					printf("\033[38;2;%d;%d;%dm", brightness, 0, 0);
+					printf("\033[38;2;%d;%d;%dm", 10 *brightness, 0, 0);
 					printf("%c", map[y][x]);
 					break;
 				case 'D':
-					printf("\033[38;2;%d;%d;%dm", brightness, 0, 0);
+					printf("\033[38;2;%d;%d;%dm", 10 * brightness, 0, 0);
 					printf("%c", map[y][x]);
 					break;
 				default:
@@ -84,6 +90,7 @@ void print_map(char** map, int height, int width, int player_position_x, int pla
 					printf("%c", map[y][x]);
 					break;
 				}
+				
 				
 			}
 				
@@ -162,7 +169,7 @@ void free_world(World* world) {
 }
 
 void print_world(World* world) {
-	print_map(world->map, world->map_height, world->map_width, world->player->x, world->player->y);
+	print_map(world->map, world->map_height, world->map_width, world->player->x, world->player->y, get_lightness_multiplier(&(world->player->lantern)));
 }
 
 unsigned char is_cell_blocked(World* world, int x, int y) {

@@ -52,6 +52,7 @@ void print_action_selection(char* username)
 	printf("[8]  - Записать состояние в дневник фермера\n");
 	printf("[9]  - Парсер файла настроек\n");
 	printf("[10] - Отправиться в приключение\n");
+	printf("[11] - Пойти в магазин\n");
 
 }
 
@@ -246,4 +247,32 @@ void print_adventure_hud(GameState* game_state) {
 	printf(" | Золото: \033[33m%dG\033[0m", game_state->player->gold);
 	printf(" | Этаж: \033[36m%d\033[0m", game_state->adventure_depth);
 	printf(" | Время: %s", get_military_time(game_state->current_hour));
+	printf("\n\n");
+	printf("Фонарь: ");
+	print_light_mode(game_state->player->lantern.light_mode);
+	int yellowness = 255 - 64 * game_state->player->lantern.light_mode;
+	printf(" | Расход: \033[38;2;255;255;%dm%d\033[0m", yellowness, game_state->player->lantern.light_mode);
+	printf(" | Керосин: ");
+	print_colored_fraction(game_state->player->lantern.kerosene, game_state->player->lantern.max_kerosene);
+}
+
+void print_light_mode(LightMode light_mode) {
+	switch (light_mode) {
+	case LIGHTMODE_DISABLED:
+		printf("ВЫКЛЮЧЕН");
+		break;
+	case LIGHTMODE_PALE:
+		printf("ТУСКЛЫЙ");
+		break;
+	case LIGHTMODE_NORMAL:
+		printf("ОБЫЧНЫЙ");
+		break;
+	case LIGHTMODE_BRIGHT:
+		printf("ЯРКИЙ");
+		break;
+	}
+}
+
+void print_colored_gold(int value) {
+	printf("\033[33m%dG\033[0m", value);
 }

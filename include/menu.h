@@ -30,3 +30,7 @@ void menu_make_character(GameState* game_state);
 void menu_print_character(GameState* game_state);
 
 void menu_sleep(GameState* game_state);
+
+void lantern_mode_menu(GameState* game_stete);
+
+void menu_shop(GameState* game_state);

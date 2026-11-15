@@ -16,7 +16,7 @@ char** generate_map();
 //Вычищает из памяти
 void free_map(char** map, int height, int width);
 
-void print_map(char** map, int height, int width, int player_position_x, int player_position_y);
+void print_map(char** map, int height, int width, int player_position_x, int player_position_y, float brightness_multiplier);
 
 //Возвращает указатель на мир с игроком
 World* get_world(Player* player, unsigned char generate_up_ladder);

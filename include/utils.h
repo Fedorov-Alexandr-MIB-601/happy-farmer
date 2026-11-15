@@ -1,6 +1,6 @@
 #pragma once
 #include "structures.h"
-
+#include "player.h"
 //		----	Функции для помощи при выводе и вводе	----
 void clear_screen();
 void print_title();
@@ -28,3 +28,7 @@ void print_id_to_item(GameState* game_state);
 void print_colored_number(int value, int max_value);
 void print_colored_fraction(int numerator, int denominator);
 void print_adventure_hud(GameState* game_state);
+
+void print_light_mode(LightMode light_mode);
+
+void print_colored_gold(int value);

@@ -173,7 +173,7 @@ int loop(GameState* game_state) {
 		print_action_selection("Ноунейм");
 	else
 		print_action_selection(player->username);
-	int user_selection = get_int_input_range("", 0, 10);
+	int user_selection = get_int_input_range("", 0, 11);
 	redraw_to_header();
 
 	switch (user_selection)
@@ -234,6 +234,12 @@ int loop(GameState* game_state) {
 			print_character_not_exist();
 		else
 			menu_adventure(game_state);
+		break;
+	case SELECTION_SHOP:
+		if (is_player_null(player))
+			print_character_not_exist();
+		else
+			menu_shop(game_state);
 		break;
 	default:
 		printf("Такого действия нет!\n");
