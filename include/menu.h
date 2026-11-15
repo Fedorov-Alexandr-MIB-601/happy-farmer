@@ -28,3 +28,5 @@ void menu_time_management(GameState* game_state);
 
 void menu_make_character(GameState* game_state);
 void menu_print_character(GameState* game_state);
+
+void menu_sleep(GameState* game_state);

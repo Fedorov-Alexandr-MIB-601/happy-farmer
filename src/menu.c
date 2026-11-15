@@ -366,6 +366,24 @@ void menu_adventure(GameState* game_state) {
 
 }
 
+void menu_sleep(GameState* game_state) {
+	if (game_state->current_hour >= START_HOUR) {
+		game_state->current_day++;
+	}
+	game_state->current_hour = START_HOUR;
+
+	game_state->player->stamina = game_state->player->max_stamina;
+	game_state->player->hp = game_state->player->max_hp;
+
+	printf("Храпака с кайфом дал!\n");
+	printf("Здоровье восстановлено: ");
+	print_colored_fraction(game_state->player->hp, game_state->player->max_hp);
+	printf("\n");
+	printf("Выносливость восстановлена: ");
+	print_colored_fraction(game_state->player->stamina, game_state->player->max_stamina);
+	printf("\n");
+
+}
 
 void menu_time_management(GameState* game_state) {
 	if (game_state->player == NULL)
@@ -387,6 +405,11 @@ void menu_time_management(GameState* game_state) {
 		menu_skip_time(game_state);
 		break;
 	case TIME_MENU_SELECTION_SLEEP:
+		if (game_state->player == NULL) {
+			printf("\033[31mНельзя спать без персонажа!\033[0m\n");
+			return;
+		}
+		menu_sleep(game_state);
 		break;
 	}
 }
