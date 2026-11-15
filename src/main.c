@@ -106,19 +106,19 @@ static void test_truecolor(void) {
 	printf("\nTrueColor gradient:\n");
 
 	/* Градиент по красному каналу */
-	for (int r = 0; r < 256; r += 8) {
-		printf("\x1b[48;2;%d;0;0m ", r);
+	for (int r = 0; r < 256; r += 2) {
+		printf("\x1b[38;2;%d;0;0mR", r);
 	}
 	printf("\x1b[0m R\n");
 
 	/* Градиент по зелёному */
-	for (int g = 0; g < 256; g += 8) {
+	for (int g = 0; g < 256; g += 2) {
 		printf("\x1b[48;2;0;%d;0m ", g);
 	}
 	printf("\x1b[0m G\n");
 
 	/* Градиент по синему */
-	for (int b = 0; b < 256; b += 8) {
+	for (int b = 0; b < 256; b += 2) {
 		printf("\x1b[48;2;0;0;%dm ", b);
 	}
 	printf("\x1b[0m B\n\n");

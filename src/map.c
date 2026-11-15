@@ -49,7 +49,7 @@ void free_map(char** map, int height, int width) {
 	}
 	free(map);
 }
-
+#include <math.h>
 void print_map(char** map, int height, int width, int player_position_x, int player_position_y) {
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
@@ -57,21 +57,31 @@ void print_map(char** map, int height, int width, int player_position_x, int pla
 				printf("\033[33m@");
 				//putc('@', stdout);
 			else {
+				float distance_x = x - player_position_x;
+				float distance_y = y - player_position_y;
+				float distance = sqrt(distance_x * distance_x + distance_y * distance_y);
+				int brightness = (int)(256.0 / (distance * 0.3));
+				
 				switch (map[y][x]) {
 				case 'R':
-					printf("\033[36m%c", map[y][x]);
+					printf("\033[38;2;%d;%d;%dm", 0, brightness, brightness);
+					printf("%c", map[y][x]);
 					break;
 				case 'T':
-					printf("\033[32m%c", map[y][x]);
+					printf("\033[38;2;%d;%d;%dm", 0, brightness, 0);
+					printf("%c", map[y][x]);
 					break;
 				case 'U':
-					printf("\033[31m%c", map[y][x]);
+					printf("\033[38;2;%d;%d;%dm", brightness, 0, 0);
+					printf("%c", map[y][x]);
 					break;
 				case 'D':
-					printf("\033[31m%c", map[y][x]);
+					printf("\033[38;2;%d;%d;%dm", brightness, 0, 0);
+					printf("%c", map[y][x]);
 					break;
 				default:
-					printf("\033[0m%c", map[y][x]);
+					printf("\033[38;2;%d;%d;%dm", brightness, brightness, brightness);
+					printf("%c", map[y][x]);
 					break;
 				}
 				
