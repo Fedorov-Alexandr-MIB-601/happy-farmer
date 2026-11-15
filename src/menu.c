@@ -252,8 +252,8 @@ void menu_settings_parser() {
 }
 
 
-
 void menu_adventure(GameState* game_state) {
+	char special_message[MAX_TOKEN_LENGTH] = {'\0'};
 	int frame_counter = 0;
 	char last_input = 0;
 
@@ -303,6 +303,8 @@ void menu_adventure(GameState* game_state) {
 				}
 			}
 
+			printf(special_message);
+			special_message[0] = '\0';
 
 			printf("\n[w] - Вверх   [s] - Вниз   [a] - Влево   [d] - Вправо   [l] - Фонарь   ");
 			if (player_cell == 'U') {
@@ -327,28 +329,58 @@ void menu_adventure(GameState* game_state) {
 				break;
 			}
 
+			
+
 			switch (last_input) {
 			case 'w':
 				if (try_move_player(world, 0, -1)) {
 					player->stamina--;
+					if (player->lantern.light_mode == LIGHTMODE_DISABLED) {
+						if (rand_range(0, 100) < 20) {
+							player->hp -= 5;
+							player->stamina -= 2;
+							strncpy(special_message, "\033[31mПод ноги смотри!\033[0m", MAX_TOKEN_LENGTH);
+						}
+					}
 					lantern_decrement_kerosine(&(player->lantern));
 				}
 				break;
 			case 'a':
 				if (try_move_player(world, -1, 0)) {
 					player->stamina--;
+					if (player->lantern.light_mode == LIGHTMODE_DISABLED) {
+						if (rand_range(0, 100) < 20) {
+							player->hp -= 5;
+							player->stamina -= 2;
+							strncpy(special_message, "\033[31mПод ноги смотри!\033[0m", MAX_TOKEN_LENGTH);
+						}
+					}
 					lantern_decrement_kerosine(&(player->lantern));
 				}
 				break;
 			case 's':
 				if (try_move_player(world, 0, 1)) {
 					player->stamina--;
+					if (player->lantern.light_mode == LIGHTMODE_DISABLED) {
+						if (rand_range(0, 100) < 20) {
+							player->hp -= 5;
+							player->stamina -= 2;
+							strncpy(special_message, "\033[31mПод ноги смотри!\033[0m", MAX_TOKEN_LENGTH);
+						}
+					}
 					lantern_decrement_kerosine(&(player->lantern));
 				}
 				break;
 			case 'd':
 				if (try_move_player(world, 1, 0)) {
 					player->stamina--;
+					if (player->lantern.light_mode == LIGHTMODE_DISABLED) {
+						if (rand_range(0, 100) < 20) {
+							player->hp -= 5;
+							player->stamina -= 2;
+							strncpy(special_message, "\033[31mПод ноги смотри!\033[0m", MAX_TOKEN_LENGTH);
+						}
+					}
 					lantern_decrement_kerosine(&(player->lantern));
 				}
 				break;
@@ -359,7 +391,11 @@ void menu_adventure(GameState* game_state) {
 
 			if (*get_cell_player_standing(world) == 'D') {
 				int reward = BASE_GOLD_MULITPLIER * game_state->adventure_depth;
-				player->gold += reward;
+				float bonus = 1;
+				if (game_state->player->lantern.light_mode == LIGHTMODE_BRIGHT)
+					bonus = 1.5;
+
+				player->gold += (int)((float)(reward) * bonus);
 				game_state->current_hour++;
 				game_state->adventure_depth++;
 				break;
@@ -523,6 +559,9 @@ void lantern_mode_menu(GameState* game_state) {
 	printf("[2] - ОБЫЧНЫЙ\n");
 	printf("[3] - ЯРКИЙ\n");
 	int user_choice = get_int_input_range("", 0, 3);
+
+	if (user_choice > game_state->player->lantern.kerosene)
+		user_choice = game_state->player->lantern.kerosene;
 
 	game_state->player->lantern.light_mode = user_choice;
 	printf("\nПрименён режим ");
