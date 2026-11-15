@@ -237,6 +237,10 @@ int loop(GameState* game_state) {
 			print_character_not_exist();
 		else if (game_state->current_hour == 2)
 			printf("\033[31mНельзя гулять после 02:00 ночи!\033[0m\n");
+		else if (player->stamina == 0)
+			printf("\033[31mТебе же выносливости не хватит!\033[0m\n");
+		else if (player->hp == 0)
+			printf("\033[31mА-А-А ЗОБМИ!!!!1!1\033[0m\n");
 		else
 			menu_adventure(game_state);
 		break;
