@@ -34,3 +34,6 @@ int get_kerosene_usage(Lantern* lantern);
 void lantern_decrement_kerosine(Lantern* lantern);
 
 void init_player(Player* player, char* username);
+
+void delta_hp(Player* player, int value);
+void delta_stamina(Player* player, int value);

@@ -63,3 +63,20 @@ void lantern_decrement_kerosine(Lantern* lantern) {
 	}
 	
 }
+
+
+void delta_hp(Player* player, int value) {
+	player->hp += value;
+	if (player->hp > player->max_hp)
+		player->hp = player->max_hp;
+	if (player->hp < 0)
+		player->hp = 0;
+
+}
+void delta_stamina(Player* player, int value) {
+	player->stamina += value;
+	if (player->stamina > player->max_stamina)
+		player->stamina = player->max_stamina;
+	if (player->stamina < 0)
+		player->stamina = 0;
+}

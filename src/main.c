@@ -235,6 +235,8 @@ int loop(GameState* game_state) {
 	case SELECTION_ADVENTURE:
 		if (is_player_null(player))
 			print_character_not_exist();
+		else if (game_state->current_hour == 2)
+			printf("\033[31mНельзя гулять после 02:00 ночи!\033[0m\n");
 		else
 			menu_adventure(game_state);
 		break;

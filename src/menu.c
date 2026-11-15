@@ -264,17 +264,22 @@ void menu_adventure(GameState* game_state) {
 
 	while (TRUE) {
 		unsigned char exit = FALSE;
-
+		unsigned char emergency_exit = FALSE;
 
 		World* world = get_world(player, generate_up_ladder);
 		if (generate_up_ladder == FALSE)
 			generate_up_ladder = TRUE;
 
 		while (TRUE) {
-
-
-
 			redraw_to_header();
+
+			if (game_state->current_hour == 2 || player->hp == 0 || player->stamina == 0) {
+				int c;
+				while ((c = getchar()) != '\n' && c != EOF); //чистим чистим чистим
+				emergency_exit = TRUE;
+				break;
+			}
+
 			printf("  <>---- \033[35mПодземелье\033[0m ----<>\n");
 			print_adventure_hud(game_state);
 			printf("\n\n");
@@ -334,11 +339,11 @@ void menu_adventure(GameState* game_state) {
 			switch (last_input) {
 			case 'w':
 				if (try_move_player(world, 0, -1)) {
-					player->stamina--;
+					delta_stamina(player, -1);
 					if (player->lantern.light_mode == LIGHTMODE_DISABLED) {
 						if (rand_range(0, 100) < 20) {
-							player->hp -= 5;
-							player->stamina -= 2;
+							delta_hp(player, -5);
+							delta_stamina(player, -2);
 							strncpy(special_message, "\033[31mПод ноги смотри!\033[0m", MAX_TOKEN_LENGTH);
 						}
 					}
@@ -347,11 +352,11 @@ void menu_adventure(GameState* game_state) {
 				break;
 			case 'a':
 				if (try_move_player(world, -1, 0)) {
-					player->stamina--;
+					delta_stamina(player, -1);
 					if (player->lantern.light_mode == LIGHTMODE_DISABLED) {
 						if (rand_range(0, 100) < 20) {
-							player->hp -= 5;
-							player->stamina -= 2;
+							delta_hp(player, -5);
+							delta_stamina(player, -2);
 							strncpy(special_message, "\033[31mПод ноги смотри!\033[0m", MAX_TOKEN_LENGTH);
 						}
 					}
@@ -360,11 +365,11 @@ void menu_adventure(GameState* game_state) {
 				break;
 			case 's':
 				if (try_move_player(world, 0, 1)) {
-					player->stamina--;
+					delta_stamina(player, -1);
 					if (player->lantern.light_mode == LIGHTMODE_DISABLED) {
 						if (rand_range(0, 100) < 20) {
-							player->hp -= 5;
-							player->stamina -= 2;
+							delta_hp(player, -5);
+							delta_stamina(player, -2);
 							strncpy(special_message, "\033[31mПод ноги смотри!\033[0m", MAX_TOKEN_LENGTH);
 						}
 					}
@@ -373,11 +378,11 @@ void menu_adventure(GameState* game_state) {
 				break;
 			case 'd':
 				if (try_move_player(world, 1, 0)) {
-					player->stamina--;
+					delta_stamina(player, -1);
 					if (player->lantern.light_mode == LIGHTMODE_DISABLED) {
 						if (rand_range(0, 100) < 20) {
-							player->hp -= 5;
-							player->stamina -= 2;
+							delta_hp(player, -5);
+							delta_stamina(player, -2);
 							strncpy(special_message, "\033[31mПод ноги смотри!\033[0m", MAX_TOKEN_LENGTH);
 						}
 					}
@@ -405,6 +410,14 @@ void menu_adventure(GameState* game_state) {
 		}
 
 		free_world(world);
+		if (emergency_exit) {
+			printf("Злобные спасательные корпорации и большая фарма\nукрали у тебя ");
+			print_colored_gold(player->gold / 2);
+			printf(" пока ты был в отключке :(\n");
+			player->gold /= 2;
+			
+			break;
+		}
 		if (exit) {
 			break;
 		}
